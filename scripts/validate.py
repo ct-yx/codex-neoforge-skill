@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SKILL_DIR = ROOT / "neoforge-dev"
 SKILL_FILE = SKILL_DIR / "SKILL.md"
 OPENAI_FILE = SKILL_DIR / "agents" / "openai.yaml"
+REFERENCE_FILE = SKILL_DIR / "references" / "official-docs.md"
 
 
 def fail(message: str) -> None:
@@ -42,6 +43,8 @@ def main() -> None:
         fail(f"missing {SKILL_FILE.relative_to(ROOT)}")
     if not OPENAI_FILE.is_file():
         fail(f"missing {OPENAI_FILE.relative_to(ROOT)}")
+    if not REFERENCE_FILE.is_file():
+        fail(f"missing {REFERENCE_FILE.relative_to(ROOT)}")
 
     fields = parse_frontmatter(SKILL_FILE.read_text(encoding="utf-8"))
     if set(fields) != {"name", "description"}:
@@ -67,10 +70,20 @@ def main() -> None:
         "NeoForge开发流程师",
         "mcp__neoforge",
     )
+    reference = REFERENCE_FILE.read_text(encoding="utf-8")
     combined = SKILL_FILE.read_text(encoding="utf-8") + interface
     for fragment in forbidden:
         if fragment in combined:
             fail(f"OpenCode-only residue found: {fragment!r}")
+
+    for fragment in (
+        "https://docs.neoforged.net/",
+        "816c03d31ff7948179c7bd4a58d23bcfda09c18a",
+        "runClientData",
+        "runServerData",
+    ):
+        if fragment not in reference:
+            fail(f"official-docs.md is missing {fragment!r}")
 
     print("Skill package is valid.")
 

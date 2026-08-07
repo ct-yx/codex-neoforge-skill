@@ -1,11 +1,11 @@
 ---
 name: neoforge-dev
-description: "Develop, debug, migrate, test, and release Minecraft mods built with NeoForge. Use when working on a NeoForge project or when the user asks about NeoForge mod setup, registries, items, blocks, entities, menus/screens, networking payloads, events, data generation, resources, world generation, Forge-to-NeoForge migration, Gradle failures, crash logs, or Minecraft/NeoForge 1.21.x development. Also trigger for Chinese requests mentioning NeoForge, 模组开发, 开发mod, 物品, 方块, 实体, 配方, 数据生成, 世界生成, Forge迁移, 构建, or 崩溃 in a NeoForge development context."
+description: "Develop, debug, migrate, test, and release Minecraft mods built with NeoForge. Use when working on a NeoForge project or when the user asks about NeoForge mod setup, registries, items, blocks, entities, menus/screens, networking payloads, events, data generation, resources, world generation, Forge-to-NeoForge migration, Gradle failures, crash logs, or Minecraft/NeoForge 1.21.x, 1.21.11, or 26.1+ development. Also trigger for Chinese requests mentioning NeoForge, 模组开发, 开发mod, 物品, 方块, 实体, 配方, 数据生成, 世界生成, Forge迁移, 构建, or 崩溃 in a NeoForge development context."
 ---
 
 # NeoForge 模组开发
 
-把当前任务当作真实工程任务执行：先检查项目与版本，再修改文件，最后运行尽可能贴近任务的验证。不要依赖其他未安装的子 skill，也不要假定存在特定 MCP。
+把当前任务当作真实工程任务执行：先检查项目与版本，再修改文件，最后运行尽可能贴近任务的验证。不要依赖其他未安装的子 skill，也不要假定存在特定 MCP。NeoForge 官方文档按 Minecraft 版本分站；当前文档线已使用 26.1/Java 25，而 1.21.1 版本线使用 Java 21。所有 API 和命令都必须以项目目标版本对应的文档为准。
 
 ## 1. 确认项目上下文
 
@@ -20,7 +20,7 @@ description: "Develop, debug, migrate, test, and release Minecraft mods built wi
 4. 检查 `git status --short`，保留用户已有改动；只编辑本任务相关文件。
 5. 从构建文件而非文件夹名推断 Minecraft、NeoForge、Java、Gradle 插件和 mappings 版本。记录实际版本后再选择 API。
 
-如果用户要求创建新项目但没有指定版本，优先采用其现有生态或相邻项目的版本；没有任何上下文时，可将 Minecraft 1.21.1、NeoForge 21.1.x、Java 21 作为明确说明的默认值。
+如果用户要求创建新项目但没有指定版本，优先采用官方 Mod Generator/MDK 当前可用版本和项目生态；没有任何上下文时，先读取官方文档当前版本，而不是静默固定旧版本。本次核对的官方文档当前线为 Minecraft 26.1、Java 25；只有用户明确要求 1.21.1 时才使用 Java 21 和对应的 1.21.1 文档线。
 
 ## 2. 选择工作路径
 
@@ -38,8 +38,7 @@ description: "Develop, debug, migrate, test, and release Minecraft mods built wi
 1. 复现最小失败命令并保留完整错误输出。
 2. 按需检查：
    - Gradle 输出及 `--stacktrace`
-   - `run/logs/latest.log`
-   - `run/crash-reports/`
+   - `runs/<side>/logs/latest.log` and `runs/<side>/crash-reports/`（或项目构建脚本配置的运行目录）
    - Mixin audit、数据包加载错误、registry/resource location 错误
 3. 先定位最早的有效异常和首个项目代码栈帧，不要只修最后一条连锁错误。
 4. 区分编译错误、模组加载错误、客户端/服务端边界错误、资源错误和游戏逻辑错误。
@@ -64,21 +63,25 @@ NeoForge API 会随 Minecraft 小版本变化。对注册、网络、菜单、�
 
 1. 当前仓库内已编译的同版本用法。
 2. Gradle 缓存中的同版本源码或生成源码。
-3. 与目标版本匹配的 NeoForge 官方文档、Javadocs、MDK 和官方仓库示例。
+3. 与目标版本匹配的 [NeoForge 官方文档](https://docs.neoforged.net/)、Javadocs、MDK 和官方仓库示例。
 4. 经过版本筛选的真实项目代码，仅作为补充证据。
+
+需要快速核对版本事实时，读取随 skill 提供的 `references/official-docs.md`；它记录了本次官方文档审计的版本映射和关键入口。不要把当前文档线的示例复制到 1.21.1 项目，反之亦然。
 
 使用可用的浏览器、代码搜索或 MCP；某个 MCP 不存在时直接使用其他可用工具。不要编造工具名或声称调用了未配置工具。引用外部示例前确认它属于同一 Minecraft/NeoForge 版本。
 
 ## 4. 实现检查点
 
-- **注册**：沿用项目的 `DeferredRegister`/holder 模式；确认注册器挂到正确的 mod event bus。
-- **事件**：区分 mod 生命周期事件和游戏运行时事件；确认事件总线、静态订阅方式和运行侧。
-- **网络**：核对目标版本的 payload 注册、codec、handler thread/上下文和方向；在服务端重新验证客户端输入。
+- **注册**：沿用项目的 `DeferredRegister`/holder 模式；确认注册器挂到正确的 mod event bus。当前文档线常见 `Identifier`，1.21.1 文档线常见 `ResourceLocation`，不要跨版本混用命名类型。
+- **事件**：区分 `NeoForge.EVENT_BUS` 游戏总线和 mod 构造器传入的 mod 总线；确认静态/实例订阅方式、生命周期事件的并行执行和运行侧。并行生命周期事件需要把主线程工作交给 `enqueueWork`。
+- **网络**：核对目标版本的 `RegisterPayloadHandlersEvent`/`PayloadRegistrar`、payload 类型、`StreamCodec`、handler thread/`IPayloadContext`、阶段和方向；客户端处理器按目标版本使用对应的 client payload 注册事件；在服务端重新验证客户端输入。
 - **菜单与界面**：服务端保存真实状态，客户端只负责展示和输入；检查容器同步、数据槽与 client-only 注册。
-- **资源**：统一使用小写命名空间和路径；确保 Java 注册名、JSON、翻译键、纹理及数据生成输出匹配。
-- **数据生成**：优先扩展仓库现有 provider；避免手写一份又由 datagen 生成另一份相互覆盖的 JSON。
+- **客户端/服务端**：用 `Level#isClientSide()` 判断逻辑侧；用 `Dist`/client-only 注册隔离物理客户端代码。单人游戏同时包含物理客户端和逻辑服务端，必须用 dedicated server 做一次兼容性验证。
+- **资源**：区分客户端 assets 与服务端 data；统一使用小写命名空间和路径，确保 Java 注册名、JSON、翻译键、纹理及 datagen 输出匹配。现代 NeoForge 会合成 mod 的 `pack.mcmeta`，除非项目有明确需求，不要重复生成冲突文件。
+- **数据生成**：沿用仓库已有的 `GatherDataEvent` 变体和 provider 注册方式；当前文档线使用 `GatherDataEvent.Client`/`.Server` 与 `runClientData`/`runServerData`，1.21.1 文档线主要描述生成的 Data run configuration 和 `GatherDataEvent`。先查看项目任务和 run 配置，不要根据版本猜任务名。
+- **数据存储**：需要给方块实体、区块、实体或世界附加持久数据时优先核对 `AttachmentType`；物品堆栈数据优先核对 vanilla data components；需要跨模组动态能力接口时再核对 block/entity/item capabilities。
 - **世界生成**：核对 configured/placed feature、biome modifier 或目标版本所用数据驱动入口及其加载顺序。
-- **Mixin**：优先使用公开 API/事件；确需 Mixin 时核对映射、方法描述符、加载侧和注入点，并启用可验证的失败策略。
+- **Mixin/Access Transformer**：优先使用公开 API/事件；确需 Mixin 时核对目标版本的配置、映射、方法描述符、加载侧和注入点，并启用可验证的失败策略。Access Transformer 要先在目标 Gradle 插件中声明；ModDevGradle 的默认 `META-INF/accesstransformer.cfg` 会自动纳入，非默认路径还要在 `neoforge.mods.toml` 中声明，改动后刷新 Gradle 项目。
 - **兼容性**：不要无意提高最低 Java、Minecraft 或 NeoForge 版本；新增依赖时说明原因和作用域。
 
 ## 5. 验证
@@ -87,11 +90,11 @@ NeoForge API 会随 Minecraft 小版本变化。对注册、网络、菜单、�
 
 按改动范围选择：
 
-1. `./gradlew compileJava`：快速验证 Java 编译。
-2. `./gradlew build`：默认回归验证；除非耗时明显不合理，代码修改后应运行。
-3. `./gradlew runData` 或项目对应任务：修改数据生成器时运行，并检查生成差异。
+1. `./gradlew compileJava`：在项目任务列表存在时快速验证 Java 编译。
+2. `./gradlew build`：官方入门文档的默认回归验证，产物通常位于 `build/libs`；除非耗时明显不合理，代码修改后应运行。
+3. 数据生成：优先运行生成的 Data run configuration；当前文档线通常对应 `runClientData`/`runServerData`，旧版本可能只有 Data 或 IDE run configuration，必须以 `./gradlew tasks` 和项目构建脚本为准，并检查 `src/generated/resources` 的差异。
 4. 测试任务：项目存在 GameTest/JUnit 时运行相关测试。
-5. `runClient` / `runServer`：仅在任务需要运行时行为验证且环境允许时运行；避免让交互式进程无限挂起，设置合理超时并检查日志。
+5. `runClient` / `runServer`：仅在任务需要运行时行为验证且环境允许时运行；默认运行目录通常是 `runs/client`、`runs/server`（项目也可能自定义为 `run/`）。检查对应目录下的 `logs/latest.log` 和 `crash-reports/`。Dedicated server 首次启动需要接受 `eula.txt`；要从开发客户端连接时，按官方文档检查 `server.properties` 的 `online-mode` 设置。
 
 如果某项验证受环境、网络或图形界面限制，仍完成其余可运行检查，并准确报告未验证项及原因。
 

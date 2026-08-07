@@ -13,7 +13,7 @@
 - 覆盖注册、事件、网络、菜单、资源、数据生成、世界生成和 Mixin
 - 包含编译、构建、数据生成、测试及运行日志验证流程
 - 不强制依赖额外 MCP；有可用工具时才使用
-- 默认参考 Minecraft 1.21.1、NeoForge 21.1.x、Java 21，但始终以项目配置为准
+- 支持当前文档线 26.1/Java 25 和版本化 1.21.x 文档；始终以项目配置为准
 
 ## 安装
 
@@ -67,7 +67,8 @@ Set-Location codex-neoforge-skill
 .
 ├── neoforge-dev/
 │   ├── SKILL.md
-│   └── agents/openai.yaml
+│   ├── agents/openai.yaml
+│   └── references/official-docs.md
 ├── scripts/
 │   ├── package.py
 │   └── validate.py
@@ -88,6 +89,8 @@ python3 scripts/package.py
 ## 来源与适配
 
 本项目基于 [cnlimiter/opencode-neoforge-skill](https://github.com/cnlimiter/opencode-neoforge-skill) 的入口 skill 思路进行 Codex 适配。上游快照未包含其 README 所列出的示例和依赖子 skill，因此本项目将入口改写为可独立执行的工作流，并移除了 OpenCode 专属权限、缺失子 skill 调度及硬编码 Windows 路径。详细来源信息见 [NOTICE.md](NOTICE.md)。
+
+当前内容已按 [NeoForge 官方文档](https://docs.neoforged.net/) 及官方文档仓库提交 `816c03d31ff7948179c7bd4a58d23bcfda09c18a` 复核，重点修正了 26.1 与 1.21.1 的 Java/版本分流、数据生成任务、运行目录和客户端/服务端边界说明。核对摘要见 [`neoforge-dev/references/official-docs.md`](neoforge-dev/references/official-docs.md)。
 
 ## License
 
