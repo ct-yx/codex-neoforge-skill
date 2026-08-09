@@ -3,17 +3,20 @@
 [![Validate](https://github.com/ct-yx/codex-neoforge-skill/actions/workflows/validate.yml/badge.svg)](https://github.com/ct-yx/codex-neoforge-skill/actions/workflows/validate.yml)
 [![Latest release](https://img.shields.io/github/v/release/ct-yx/codex-neoforge-skill)](https://github.com/ct-yx/codex-neoforge-skill/releases/latest)
 
-面向 Codex 的 NeoForge 模组开发 skill，覆盖项目识别、功能开发、构建调试、Forge 迁移、版本专属 API 核对和交付验证。
+面向 Codex 的 Minecraft 模组开发 skill，默认以 NeoForge 1.21.1/Java 21 为基线，覆盖项目识别、代码与项目结构规范、功能开发、构建调试、数据生成、测试验收，以及基线完成后的 Forge 1.20.1/Cleanroom 1.12.2 迁移。
 
 ## 特点
 
 - 原生 Codex `SKILL.md` 与 `agents/openai.yaml` 结构
 - 自动读取项目 `AGENTS.md` 和 Gradle 配置，不绑定固定工作目录
 - 从项目文件识别 Minecraft、NeoForge、Java 与 mappings 版本
-- 覆盖注册、事件、网络、菜单、资源、数据生成、世界生成和 Mixin
+- 覆盖注册、事件、网络、菜单、资源、数据生成、世界生成、存储、Mixin 和 Access Transformer
 - 包含编译、构建、数据生成、测试及运行日志验证流程
+- 内置 `BASELINE_GATE`：未完成 NeoForge 1.21.1 基线验收时，只记录迁移资料，不修改 Forge/Cleanroom 移植代码
+- 按版本分开的 Java、Gradle、元数据、事件、网络、侧和资源知识库
+- 内置文档爬虫、标题/关键词索引、loader 识别和项目结构检查脚本
 - 不强制依赖额外 MCP；有可用工具时才使用
-- 支持当前文档线 26.1/Java 25 和版本化 1.21.x 文档；始终以项目配置为准
+- 支持 NeoForge 1.21.1、Forge 1.20.1 和 Cleanroom 1.12.2 的版本分流；始终以项目配置和对应官方资料为准
 
 ## 安装
 
@@ -68,10 +71,21 @@ Set-Location codex-neoforge-skill
 ├── neoforge-dev/
 │   ├── SKILL.md
 │   ├── agents/openai.yaml
-│   └── references/official-docs.md
+│   ├── references/
+│   │   ├── common/
+│   │   ├── neoforge/1.21.1.md
+│   │   ├── forge/1.20.1.md
+│   │   ├── cleanroom/1.12.2.md
+│   │   ├── migration/
+│   │   └── baseline-gate.md
+│   └── scripts/
+│       ├── crawl_docs.py
+│       ├── build_doc_index.py
+│       ├── validate_loader.py
+│       └── validate_structure.py
 ├── scripts/
-│   ├── package.py
-│   └── validate.py
+│   ├── package.py / validate.py
+│   └── （bundled script 的 CLI wrapper）
 ├── install.sh
 ├── install.ps1
 └── README.md
@@ -81,6 +95,8 @@ Set-Location codex-neoforge-skill
 
 ```bash
 python3 scripts/validate.py
+python3 scripts/validate_loader.py /path/to/mod-project --json
+python3 scripts/validate_structure.py /path/to/mod-project --loader auto
 python3 scripts/package.py
 ```
 
@@ -90,7 +106,7 @@ python3 scripts/package.py
 
 本项目基于 [cnlimiter/opencode-neoforge-skill](https://github.com/cnlimiter/opencode-neoforge-skill) 的入口 skill 思路进行 Codex 适配。上游快照未包含其 README 所列出的示例和依赖子 skill，因此本项目将入口改写为可独立执行的工作流，并移除了 OpenCode 专属权限、缺失子 skill 调度及硬编码 Windows 路径。详细来源信息见 [NOTICE.md](NOTICE.md)。
 
-当前内容已按 [NeoForge 官方文档](https://docs.neoforged.net/) 及官方文档仓库提交 `816c03d31ff7948179c7bd4a58d23bcfda09c18a` 复核，重点修正了 26.1 与 1.21.1 的 Java/版本分流、数据生成任务、运行目录和客户端/服务端边界说明。核对摘要见 [`neoforge-dev/references/official-docs.md`](neoforge-dev/references/official-docs.md)。
+当前内容已按 [NeoForge 官方文档](https://docs.neoforged.net/)（提交 `816c03d31ff7948179c7bd4a58d23bcfda09c18a`）、[Forge 1.20.x 文档](https://github.com/MinecraftForge/Documentation/tree/1.20.x)（提交 `87526dd760129b356e88f130550d646d4eb2fa31`）和 CleanroomMC 官方模板/构建仓库复核。版本证据和来源见 [`neoforge-dev/references/official-docs.md`](neoforge-dev/references/official-docs.md)，迁移门控见 [`neoforge-dev/references/baseline-gate.md`](neoforge-dev/references/baseline-gate.md)。
 
 ## License
 

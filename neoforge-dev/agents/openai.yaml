@@ -1,4 +1,4 @@
 interface:
   display_name: "NeoForge 模组开发"
-  short_description: "开发、调试、迁移并验证 NeoForge 模组项目"
-  default_prompt: "使用 $neoforge-dev 检查当前项目并完成这个 NeoForge 模组开发任务。"
+  short_description: "以 1.21.1 为基线开发并按门控迁移模组项目"
+  default_prompt: "使用 $neoforge-dev 以 NeoForge 1.21.1 为基线检查当前项目并完成这个 Minecraft 模组开发任务。"

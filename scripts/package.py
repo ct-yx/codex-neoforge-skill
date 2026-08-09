@@ -22,7 +22,11 @@ def main() -> None:
     subprocess.run([sys.executable, str(ROOT / "scripts" / "validate.py")], check=True)
     DIST_DIR.mkdir(parents=True, exist_ok=True)
 
-    files = sorted(path for path in SKILL_DIR.rglob("*") if path.is_file())
+    files = sorted(
+        path
+        for path in SKILL_DIR.rglob("*")
+        if path.is_file() and "__pycache__" not in path.parts and path.suffix != ".pyc"
+    )
     if not files:
         raise SystemExit("No skill files found")
 

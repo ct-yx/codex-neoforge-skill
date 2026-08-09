@@ -1,109 +1,159 @@
 ---
 name: neoforge-dev
-description: "Develop, debug, migrate, test, and release Minecraft mods built with NeoForge. Use when working on a NeoForge project or when the user asks about NeoForge mod setup, registries, items, blocks, entities, menus/screens, networking payloads, events, data generation, resources, world generation, Forge-to-NeoForge migration, Gradle failures, crash logs, or Minecraft/NeoForge 1.21.x, 1.21.11, or 26.1+ development. Also trigger for Chinese requests mentioning NeoForge, 模组开发, 开发mod, 物品, 方块, 实体, 配方, 数据生成, 世界生成, Forge迁移, 构建, or 崩溃 in a NeoForge development context."
+description: "面向 Codex 的 Minecraft 模组工程 skill：默认以 NeoForge 1.21.1 为基线，支持项目识别、Java/Gradle 代码与结构规范、注册/事件/网络/资源/数据生成、构建调试、测试验收，以及在基线完成后按官方资料迁移到 Forge 1.20.1 或 Cleanroom 1.12.2。用于 NeoForge、Forge、Cleanroom、模组开发、开发 mod、物品、方块、实体、配方、世界生成、数据生成、构建、崩溃、移植或版本兼容请求。"
 ---
 
-# NeoForge 模组开发
+# Minecraft 模组开发（NeoForge 1.21.1 基线）
 
-把当前任务当作真实工程任务执行：先检查项目与版本，再修改文件，最后运行尽可能贴近任务的验证。不要依赖其他未安装的子 skill，也不要假定存在特定 MCP。NeoForge 官方文档按 Minecraft 版本分站；当前文档线已使用 26.1/Java 25，而 1.21.1 版本线使用 Java 21。所有 API 和命令都必须以项目目标版本对应的文档为准。
+把当前请求当作真实工程任务执行：读取项目事实，选择唯一目标加载器和版本，修改最小文件集合，最后运行可复核的构建/运行验证。不要依赖未安装的子 skill、固定工作目录或未配置 MCP。
 
-## 1. 确认项目上下文
+## 0. 基线门控（必须先执行）
 
-1. 从当前工作目录开始，先读取适用范围内的 `AGENTS.md` 或其他仓库说明。
-2. 定位项目根目录。优先查找：
-   - `settings.gradle` / `settings.gradle.kts`
-   - `build.gradle` / `build.gradle.kts`
-   - `gradlew`
-   - `gradle.properties`
-   - `src/main/resources/META-INF/neoforge.mods.toml`
-3. 使用现有工作区，不要强制切换到固定目录。除非用户明确要求，不要在工作区外新建项目。
-4. 检查 `git status --short`，保留用户已有改动；只编辑本任务相关文件。
-5. 从构建文件而非文件夹名推断 Minecraft、NeoForge、Java、Gradle 插件和 mappings 版本。记录实际版本后再选择 API。
+默认目标是 **NeoForge 1.21.1 + Java 21**。Forge 1.20.1 和 Cleanroom 1.12.2 是后续候选迁移目标。
 
-如果用户要求创建新项目但没有指定版本，优先采用官方 Mod Generator/MDK 当前可用版本和项目生态；没有任何上下文时，先读取官方文档当前版本，而不是静默固定旧版本。本次核对的官方文档当前线为 Minecraft 26.1、Java 25；只有用户明确要求 1.21.1 时才使用 Java 21 和对应的 1.21.1 文档线。
+```text
+BASELINE_GATE:
+先完成 NeoForge 1.21.1 基线开发与验收。
+基线未完成时，只记录迁移资料，不执行 Forge/Cleanroom 移植设计或代码修改。
+只有基线验收完成且用户明确指定目标加载器和版本后，才进入移植任务。
+```
 
-## 2. 选择工作路径
+详细门控和验收证据见 [references/baseline-gate.md](references/baseline-gate.md)。收到 Forge/Cleanroom 请求时，先检查 `baseline_status` 和证据；状态为 `in_progress`/`unknown` 时只做资料登记、只读识别和差异表，不替换 API、构建文件或资源。
 
-### 实现或修改功能
+## 1. 读取项目事实
 
-1. 在仓库中搜索同类注册、事件、资源和命名约定。
-2. 列出该功能涉及的最小文件集合：Java 源码、资源、数据生成器、语言文件、模型/纹理或测试。
-3. 确认逻辑运行侧：common、server 或 client。避免从服务端可加载类直接引用仅客户端类。
-4. 沿用项目已有的注册体系与包结构；不要为单个功能引入第二套架构。
-5. 同步补齐资源与数据：注册名、资源路径、翻译键、模型、loot table、recipe、tag 等必须一致。
-6. 完成后先编译，再运行更贴近改动的任务。
+按以下顺序执行，不凭目录名或记忆猜版本：
 
-### 调试构建或崩溃
+1. 从当前工作目录向上读取适用的 `AGENTS.md`、README 和构建说明。
+2. 定位包含 `settings.gradle[.kts]`、`build.gradle[.kts]`、`gradlew`、`gradle.properties` 的项目根。
+3. 运行只读识别：
 
-1. 复现最小失败命令并保留完整错误输出。
-2. 按需检查：
-   - Gradle 输出及 `--stacktrace`
-   - `runs/<side>/logs/latest.log` and `runs/<side>/crash-reports/`（或项目构建脚本配置的运行目录）
-   - Mixin audit、数据包加载错误、registry/resource location 错误
-3. 先定位最早的有效异常和首个项目代码栈帧，不要只修最后一条连锁错误。
-4. 区分编译错误、模组加载错误、客户端/服务端边界错误、资源错误和游戏逻辑错误。
-5. 做最小修复后执行同一复现步骤，并补跑回归构建。
+   ```bash
+   python3 neoforge-dev/scripts/validate_loader.py PROJECT --json
+   python3 neoforge-dev/scripts/validate_structure.py PROJECT --loader auto --json
+   ```
 
-### Forge 迁移到 NeoForge
+   如果从已安装 skill 运行，使用 `python3 $CODEX_HOME/skills/neoforge-dev/scripts/...`。
 
-1. 先盘点源版本、目标版本、构建插件、mappings、入口注解、事件总线、注册、网络、能力/附件、配置和 access transformer/mixin。
-2. 分阶段迁移：构建可解析 → 主源码可编译 → 资源可加载 → 数据生成可运行 → 客户端/服务端启动 → 功能回归。
-3. 不要机械替换包名。对目标版本逐项核对事件、payload、registry、attachment/capability 和生命周期 API。
-4. 保持每阶段改动可验证，避免同时重写无关业务逻辑。
+4. 从 Gradle toolchain、依赖声明、元数据和任务列表记录 Minecraft、loader、Java、Gradle、mappings、运行目录和数据生成任务。
+5. 查看 `git status --short`，保留用户已有改动，只编辑本任务相关文件。
 
-### 创建新项目
+识别结果冲突时，以构建脚本、Gradle 解析和实际任务为准；把冲突写入报告，不静默选择一个版本。
 
-1. 优先使用与目标版本匹配的官方 MDK 或官方示例作为基础，不要凭记忆拼装 Gradle 配置。
-2. 确定 `mod_id`、显示名称、包名、版本、许可证和基础功能；只有真正影响工程结构的缺失信息才需要询问。
-3. 生成后立即验证 wrapper、Java toolchain、依赖解析、模组元数据和空项目构建。
+## 2. 代码生成契约
 
-## 3. 核对版本专属 API
+将以下规则当作每次生成/修改代码前的固定提示词：
 
-NeoForge API 会随 Minecraft 小版本变化。对注册、网络、菜单、渲染、数据生成、世界生成、attachments/capabilities、配置和事件签名执行以下核对顺序：
+```text
+CODE_CONTRACT:
+先读 AGENTS.md、Gradle 配置和仓库内同类实现；再写代码。
+基线默认 Java 21 + NeoForge 1.21.1；每个示例标注 loader、Minecraft、Java 和运行侧。
+禁止跨 loader、跨 Minecraft 版本或 current-doc API import；不要做全局包名替换。
+沿用已有包结构、注册方式、命名、日志和测试风格；不要为单个功能引入第二套架构。
+输出完整可编译的最小改动，源码、资源、数据生成和测试一起检查，不留伪 API。
+common/server 类不得加载 client-only 类；网络输入在服务端重新验证权限、范围、区块和状态。
+注册名、资源路径、翻译键、配方、loot、tag 和模型使用同一个小写 mod_id。
+改动后先 compileJava/build，再运行对应数据生成、客户端、专用服务器和测试；报告未运行项。
+```
 
-1. 当前仓库内已编译的同版本用法。
-2. Gradle 缓存中的同版本源码或生成源码。
-3. 与目标版本匹配的 [NeoForge 官方文档](https://docs.neoforged.net/)、Javadocs、MDK 和官方仓库示例。
-4. 经过版本筛选的真实项目代码，仅作为补充证据。
+Java 命名、侧/线程、包结构和资源不变量见：
 
-需要快速核对版本事实时，读取随 skill 提供的 `references/official-docs.md`；它记录了本次官方文档审计的版本映射和关键入口。不要把当前文档线的示例复制到 1.21.1 项目，反之亦然。
+- [references/common/java-style.md](references/common/java-style.md)
+- [references/common/package-structure.md](references/common/package-structure.md)
+- [references/common/resources-layout.md](references/common/resources-layout.md)
 
-使用可用的浏览器、代码搜索或 MCP；某个 MCP 不存在时直接使用其他可用工具。不要编造工具名或声称调用了未配置工具。引用外部示例前确认它属于同一 Minecraft/NeoForge 版本。
+## 3. 按目标版本加载知识库
 
-## 4. 实现检查点
+只加载与已确认版本匹配的一个文件，禁止把下列 API 互相混用：
 
-- **注册**：沿用项目的 `DeferredRegister`/holder 模式；确认注册器挂到正确的 mod event bus。当前文档线常见 `Identifier`，1.21.1 文档线常见 `ResourceLocation`，不要跨版本混用命名类型。
-- **事件**：区分 `NeoForge.EVENT_BUS` 游戏总线和 mod 构造器传入的 mod 总线；确认静态/实例订阅方式、生命周期事件的并行执行和运行侧。并行生命周期事件需要把主线程工作交给 `enqueueWork`。
-- **网络**：核对目标版本的 `RegisterPayloadHandlersEvent`/`PayloadRegistrar`、payload 类型、`StreamCodec`、handler thread/`IPayloadContext`、阶段和方向；客户端处理器按目标版本使用对应的 client payload 注册事件；在服务端重新验证客户端输入。
-- **菜单与界面**：服务端保存真实状态，客户端只负责展示和输入；检查容器同步、数据槽与 client-only 注册。
-- **客户端/服务端**：用 `Level#isClientSide()` 判断逻辑侧；用 `Dist`/client-only 注册隔离物理客户端代码。单人游戏同时包含物理客户端和逻辑服务端，必须用 dedicated server 做一次兼容性验证。
-- **资源**：区分客户端 assets 与服务端 data；统一使用小写命名空间和路径，确保 Java 注册名、JSON、翻译键、纹理及 datagen 输出匹配。现代 NeoForge 会合成 mod 的 `pack.mcmeta`，除非项目有明确需求，不要重复生成冲突文件。
-- **数据生成**：沿用仓库已有的 `GatherDataEvent` 变体和 provider 注册方式；当前文档线使用 `GatherDataEvent.Client`/`.Server` 与 `runClientData`/`runServerData`，1.21.1 文档线主要描述生成的 Data run configuration 和 `GatherDataEvent`。先查看项目任务和 run 配置，不要根据版本猜任务名。
-- **数据存储**：需要给方块实体、区块、实体或世界附加持久数据时优先核对 `AttachmentType`；物品堆栈数据优先核对 vanilla data components；需要跨模组动态能力接口时再核对 block/entity/item capabilities。
-- **世界生成**：核对 configured/placed feature、biome modifier 或目标版本所用数据驱动入口及其加载顺序。
-- **Mixin/Access Transformer**：优先使用公开 API/事件；确需 Mixin 时核对目标版本的配置、映射、方法描述符、加载侧和注入点，并启用可验证的失败策略。Access Transformer 要先在目标 Gradle 插件中声明；ModDevGradle 的默认 `META-INF/accesstransformer.cfg` 会自动纳入，非默认路径还要在 `neoforge.mods.toml` 中声明，改动后刷新 Gradle 项目。
-- **兼容性**：不要无意提高最低 Java、Minecraft 或 NeoForge 版本；新增依赖时说明原因和作用域。
+| 目标 | 先读 | 不得混入 |
+| --- | --- | --- |
+| NeoForge 1.21.1 基线 | [references/neoforge/1.21.1.md](references/neoforge/1.21.1.md) | Forge `mods.toml`/`SimpleChannel`、Cleanroom `mcmod.info`/旧生命周期、26.1 `Identifier`/Java 25 |
+| Forge 1.20.1（门控后） | [references/forge/1.20.1.md](references/forge/1.20.1.md) | NeoForge payload/StreamCodec、Cleanroom 1.12.2 生命周期、Java 21 假设 |
+| Cleanroom 1.12.2（门控后） | [references/cleanroom/1.12.2.md](references/cleanroom/1.12.2.md) | 1.20.1/1.21.1 注册、现代数据组件、现代 payload、现代事件签名 |
 
-## 5. 验证
+### NeoForge 1.21.1 默认规则
 
-使用仓库自带 wrapper。macOS/Linux 通常运行 `./gradlew`，Windows 通常运行 `gradlew.bat`。先查看 `./gradlew tasks` 或构建脚本以确认任务名，不要假定所有项目都有同名任务。
+- 使用 Java 21 和 `META-INF/neoforge.mods.toml`；标识符仍按 1.21.1 的 `ResourceLocation` 体系核对。
+- 注册优先现有 `DeferredRegister`/holder 并挂到 mod event bus；区分 `NeoForge.EVENT_BUS` 与 mod bus。
+- 网络按目标版本的 `RegisterPayloadHandlersEvent`、`PayloadRegistrar`、`CustomPacketPayload`、`StreamCodec`、`IPayloadContext` 签名核对；不要凭当前文档线猜任务或线程。
+- 逻辑侧使用 `Level#isClientSide()` 等价 API，物理侧用 `Dist`/客户端注册隔离；服务端保存权威状态。
+- 附加持久数据先核对 `AttachmentType`，ItemStack 先核对 data components，动态接口再考虑 capabilities。
 
-按改动范围选择：
+## 4. 实现与调试工作流
 
-1. `./gradlew compileJava`：在项目任务列表存在时快速验证 Java 编译。
-2. `./gradlew build`：官方入门文档的默认回归验证，产物通常位于 `build/libs`；除非耗时明显不合理，代码修改后应运行。
-3. 数据生成：优先运行生成的 Data run configuration；当前文档线通常对应 `runClientData`/`runServerData`，旧版本可能只有 Data 或 IDE run configuration，必须以 `./gradlew tasks` 和项目构建脚本为准，并检查 `src/generated/resources` 的差异。
-4. 测试任务：项目存在 GameTest/JUnit 时运行相关测试。
-5. `runClient` / `runServer`：仅在任务需要运行时行为验证且环境允许时运行；默认运行目录通常是 `runs/client`、`runs/server`（项目也可能自定义为 `run/`）。检查对应目录下的 `logs/latest.log` 和 `crash-reports/`。Dedicated server 首次启动需要接受 `eula.txt`；要从开发客户端连接时，按官方文档检查 `server.properties` 的 `online-mode` 设置。
+### 新功能或结构调整
 
-如果某项验证受环境、网络或图形界面限制，仍完成其余可运行检查，并准确报告未验证项及原因。
+1. 搜索同类注册、事件、资源、数据生成和测试。
+2. 列出最小文件集合：Java、资源、数据 provider、语言、模型/纹理、测试。
+3. 确认 common/server/client 侧和事件线程；隔离 client-only 类。
+4. 按目标版本知识库实现注册、事件、网络、菜单、渲染、世界生成或存储。
+5. 同步 `assets/<mod_id>` 与 `data/<mod_id>`，确认资源路径和注册名一致。
+6. 先编译，再运行最贴近改动的任务；保留日志、产物和 diff。
 
-## 6. 交付格式
+### 构建或崩溃
 
-完成任务后简洁报告：
+1. 先运行 `./gradlew tasks --all`，确认真实任务名和运行目录。
+2. 重现最小失败命令并保留完整输出；定位首个有效异常和首个项目代码栈帧。
+3. 区分编译、模组加载、逻辑/物理侧、资源/数据包、网络和游戏逻辑错误。
+4. 修改最小范围，重新运行同一复现步骤和 `build`；不要只修最后一条连锁错误。
 
-1. 实际修改了什么，以及关键文件路径。
-2. 运行了哪些命令及其结果。
-3. 仍需人工进游戏验证的行为，或任何明确遗留问题。
+### 迁移任务（仅门控解锁后）
 
-不要把计划当作完成结果，也不要声称缺失的示例、子 skill、MCP 或构建产物已经存在。
+1. 记录源/目标 loader、Minecraft、Java、Gradle、mappings、元数据、事件、注册、网络、存储、AT/Mixin 差异。
+2. 使用 [references/migration/neoforge-to-forge.md](references/migration/neoforge-to-forge.md) 或 [references/migration/forge-to-cleanroom.md](references/migration/forge-to-cleanroom.md)。
+3. 创建独立迁移分支；先让目标 Gradle 解析，再逐层迁移入口/注册/事件、网络/存储、资源/数据、客户端/服务器。
+4. 每阶段运行编译和最小启动；不把迁移失败修复回写到已验收的 NeoForge 基线。
+
+## 5. 验证与验收
+
+使用仓库 wrapper，不假定所有项目存在同名任务：
+
+```bash
+./gradlew tasks --all
+./gradlew compileJava       # 任务存在时
+./gradlew build
+./gradlew runClient         # 需要运行时验证时
+./gradlew runServer         # 需要专用服务器验证时
+```
+
+- NeoForge 1.21.1：运行项目生成的 Data run configuration/GatherDataEvent，查看 `runs/client`、`runs/server`；不要盲猜 `runData`。
+- Forge 1.20.1：常见 `GatherDataEvent` + `runData`，但以任务列表为准；默认运行目录通常 `run`。
+- Cleanroom 1.12.2：模板常见 `runClient`、`runServer`、`genSources`，仍以项目任务为准。
+- 项目有 GameTest/JUnit 时运行相应测试；检查 `build/libs`、生成资源、日志和 crash report。
+- 把静态、构建、CI、客户端和 dedicated server 证据分开；环境不允许的验证标记为待完成，不宣称通过。
+
+完整检查表见 [references/common/testing-validation.md](references/common/testing-validation.md) 和 [references/baseline-gate.md](references/baseline-gate.md)。
+
+## 6. 辅助脚本
+
+脚本只读或写指定输出目录，不修改模组源码：
+
+```bash
+# 抓取同域名 HTML，处理 429/5xx 退避，输出 manifest.json 与 pages/
+python3 neoforge-dev/scripts/crawl_docs.py \
+  --url https://docs.neoforged.net/docs/1.21.1/ \
+  --output /tmp/neoforge-docs --max-pages 200
+
+# 从 Markdown/MDX/HTML 建立标题、关键词、哈希索引
+python3 neoforge-dev/scripts/build_doc_index.py \
+  --input /tmp/neoforge-docs/pages --output /tmp/neoforge-doc-index.json
+
+# 识别 loader、Minecraft、Java，期望不匹配时返回非零
+python3 neoforge-dev/scripts/validate_loader.py . --expect-loader neoforge --expect-minecraft 1.21.1
+
+# 检查对应目录和元数据文件
+python3 neoforge-dev/scripts/validate_structure.py . --loader auto
+```
+
+仓库根目录的同名 `scripts/*.py` 是上述 bundled script 的 CLI wrapper；安装后优先使用 skill 目录内版本。
+
+## 7. 交付格式
+
+完成后只报告事实：
+
+1. 修改的文件和关键决策（含目标 loader/版本）。
+2. 执行的命令、退出结果、产物和日志路径。
+3. 仍需真实客户端/专用服务器或用户确认的项目。
+
+不要把未执行的计划写成完成结果，也不要声称缺失的 API、MCP、示例或验证已经存在。

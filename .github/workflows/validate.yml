@@ -17,6 +17,13 @@ jobs:
           python-version: "3.12"
       - name: Validate skill
         run: python3 scripts/validate.py
+      - name: Check bundled helper scripts
+        run: |
+          python3 -m py_compile neoforge-dev/scripts/*.py
+          python3 neoforge-dev/scripts/crawl_docs.py --help >/dev/null
+          python3 neoforge-dev/scripts/build_doc_index.py --help >/dev/null
+          python3 neoforge-dev/scripts/validate_loader.py --help >/dev/null
+          python3 neoforge-dev/scripts/validate_structure.py --help >/dev/null
       - name: Build release archive
         run: python3 scripts/package.py
       - name: Inspect archive

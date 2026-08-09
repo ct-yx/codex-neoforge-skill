@@ -13,6 +13,24 @@ SKILL_DIR = ROOT / "neoforge-dev"
 SKILL_FILE = SKILL_DIR / "SKILL.md"
 OPENAI_FILE = SKILL_DIR / "agents" / "openai.yaml"
 REFERENCE_FILE = SKILL_DIR / "references" / "official-docs.md"
+REFERENCE_FILES = (
+    SKILL_DIR / "references" / "baseline-gate.md",
+    SKILL_DIR / "references" / "common" / "java-style.md",
+    SKILL_DIR / "references" / "common" / "package-structure.md",
+    SKILL_DIR / "references" / "common" / "resources-layout.md",
+    SKILL_DIR / "references" / "common" / "testing-validation.md",
+    SKILL_DIR / "references" / "neoforge" / "1.21.1.md",
+    SKILL_DIR / "references" / "forge" / "1.20.1.md",
+    SKILL_DIR / "references" / "cleanroom" / "1.12.2.md",
+    SKILL_DIR / "references" / "migration" / "neoforge-to-forge.md",
+    SKILL_DIR / "references" / "migration" / "forge-to-cleanroom.md",
+)
+BUNDLED_SCRIPTS = (
+    SKILL_DIR / "scripts" / "crawl_docs.py",
+    SKILL_DIR / "scripts" / "build_doc_index.py",
+    SKILL_DIR / "scripts" / "validate_loader.py",
+    SKILL_DIR / "scripts" / "validate_structure.py",
+)
 
 
 def fail(message: str) -> None:
@@ -43,8 +61,14 @@ def main() -> None:
         fail(f"missing {SKILL_FILE.relative_to(ROOT)}")
     if not OPENAI_FILE.is_file():
         fail(f"missing {OPENAI_FILE.relative_to(ROOT)}")
-    if not REFERENCE_FILE.is_file():
-        fail(f"missing {REFERENCE_FILE.relative_to(ROOT)}")
+    for reference_path in (REFERENCE_FILE, *REFERENCE_FILES):
+        if not reference_path.is_file():
+            fail(f"missing {reference_path.relative_to(ROOT)}")
+        if not reference_path.read_text(encoding="utf-8").strip():
+            fail(f"empty reference {reference_path.relative_to(ROOT)}")
+    for script_path in BUNDLED_SCRIPTS:
+        if not script_path.is_file():
+            fail(f"missing {script_path.relative_to(ROOT)}")
 
     fields = parse_frontmatter(SKILL_FILE.read_text(encoding="utf-8"))
     if set(fields) != {"name", "description"}:
@@ -81,9 +105,26 @@ def main() -> None:
         "816c03d31ff7948179c7bd4a58d23bcfda09c18a",
         "runClientData",
         "runServerData",
+        "87526dd760129b356e88f130550d646d4eb2fa31",
+        "89314645e4e8b713688ba49ea6f84cbffd30cac7",
     ):
         if fragment not in reference:
             fail(f"official-docs.md is missing {fragment!r}")
+
+    skill = SKILL_FILE.read_text(encoding="utf-8")
+    for fragment in (
+        "NeoForge 1.21.1",
+        "Java 21",
+        "BASELINE_GATE:",
+        "基线未完成时，只记录迁移资料，不执行 Forge/Cleanroom 移植设计或代码修改。",
+        "只有基线验收完成且用户明确指定目标加载器和版本后，才进入移植任务。",
+        "Forge 1.20.1",
+        "Cleanroom 1.12.2",
+        "validate_loader.py",
+        "validate_structure.py",
+    ):
+        if fragment not in skill:
+            fail(f"SKILL.md is missing {fragment!r}")
 
     print("Skill package is valid.")
 

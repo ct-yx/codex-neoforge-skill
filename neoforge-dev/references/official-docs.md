@@ -41,3 +41,23 @@
 - 数据 attachments：[attachments](https://docs.neoforged.net/docs/datastorage/attachments)
 - Capabilities：[capabilities](https://docs.neoforged.net/docs/inventories/capabilities)
 - 1.21.1 版本入口：[1.21.1 gettingstarted](https://docs.neoforged.net/docs/1.21.1/gettingstarted/)
+
+## 后续迁移资料（只读参考）
+
+这些资料已经按用户指定的候选目标进行源码审阅；它们不解锁迁移门控，也不应在 NeoForge 1.21.1 基线示例中混用。
+
+### Forge 1.20.1
+
+- 官方文档仓库：[MinecraftForge/Documentation `1.20.x`](https://github.com/MinecraftForge/Documentation/tree/1.20.x)
+- 审计提交：`87526dd760129b356e88f130550d646d4eb2fa31`
+- 已核对：getting started、项目结构、`mods.toml`、生命周期、事件、注册、侧、SimpleChannel、数据生成、配置、GameTest、菜单/屏幕、实体/方块实体、Capabilities、Codecs、SavedData、渲染、资源和 Access Transformers。
+- 版本锚点：Java 17、ForgeGradle/MDK、`@Mod`、`FMLJavaModLoadingContext.get().getModEventBus()`、`DeferredRegister`、`SimpleChannel`、`GatherDataEvent`/`runData`、`run` 运行目录和 `build/libs`。
+
+### Cleanroom 1.12.2
+
+- 官方 Wiki 源码：[CleanroomMC/Website](https://github.com/CleanroomMC/Website)，提交 `89314645e4e8b713688ba49ea6f84cbffd30cac7`
+- 模板：[CleanroomMC/CleanroomModTemplate](https://github.com/CleanroomMC/CleanroomModTemplate)，提交 `49d07a16035b4da77786bd00a4b2f372d30ecdb7`
+- 开发环境：[CleanroomMC/ForgeDevEnv](https://github.com/CleanroomMC/ForgeDevEnv)，提交 `16d82d28244508f419f62718605213148da1a5f3`
+- 构建插件：[CleanroomMC/CleanroomGradle](https://github.com/CleanroomMC/CleanroomGradle)，提交 `0eecbbdc52b4c0e3917ccd7a198f560c43987dec`
+- 已核对：Forge 模组开发 wiki、Cleanroom porting、Unimined/Blossom 模板、gradle.properties、AT、CleanMix/MixinBooter、旧版生命周期、逻辑/物理侧、block update flags 和类加载器陷阱。
+- 版本锚点：Minecraft 1.12.2；审计模板使用 MCP stable `39-1.12`、Cleanroom `0.6.6-alpha`、`modImplementation`/`modRuntimeOnly`、`runClient`/`runServer`/`genSources`；Java toolchain 以模板和 CI 为准（审计模板为 Java 25）。
