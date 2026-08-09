@@ -9,6 +9,9 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+README_FILE = ROOT / "README.md"
+CONTRIBUTING_FILE = ROOT / "CONTRIBUTING.md"
+NOTICE_FILE = ROOT / "NOTICE.md"
 SKILL_DIR = ROOT / "neoforge-dev"
 SKILL_FILE = SKILL_DIR / "SKILL.md"
 OPENAI_FILE = SKILL_DIR / "agents" / "openai.yaml"
@@ -57,6 +60,11 @@ def parse_frontmatter(text: str) -> dict[str, str]:
 
 
 def main() -> None:
+    for root_doc in (README_FILE, CONTRIBUTING_FILE, NOTICE_FILE):
+        if not root_doc.is_file():
+            fail(f"missing {root_doc.relative_to(ROOT)}")
+        if not root_doc.read_text(encoding="utf-8").strip():
+            fail(f"empty root document {root_doc.relative_to(ROOT)}")
     if not SKILL_FILE.is_file():
         fail(f"missing {SKILL_FILE.relative_to(ROOT)}")
     if not OPENAI_FILE.is_file():
@@ -125,6 +133,27 @@ def main() -> None:
     ):
         if fragment not in skill:
             fail(f"SKILL.md is missing {fragment!r}")
+
+    readme = README_FILE.read_text(encoding="utf-8")
+    for fragment in (
+        "NeoForge 1.21.1 / Java 21",
+        "BASELINE_GATE:",
+        "Forge 1.20.1",
+        "Cleanroom 1.12.2",
+        "releases/latest/download/neoforge-dev.zip",
+        "CONTRIBUTING.md",
+    ):
+        if fragment not in readme:
+            fail(f"README.md is missing {fragment!r}")
+
+    notice = NOTICE_FILE.read_text(encoding="utf-8")
+    for fragment in (
+        "cnlimiter/opencode-neoforge-skill",
+        "6b1b55cefaa0be602ad1f96b678d9a4cd26eb67c",
+        "official-docs.md",
+    ):
+        if fragment not in notice:
+            fail(f"NOTICE.md is missing {fragment!r}")
 
     print("Skill package is valid.")
 
