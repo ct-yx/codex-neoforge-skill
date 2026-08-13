@@ -19,11 +19,12 @@
 
 ## 分阶段顺序
 
-1. 复制 Forge 基线业务代码，建立 Cleanroom 模板分支。
-2. 填写 `gradle.properties` 和 Blossom 模板，确认 `runClient`/`runServer`/`genSources`。
-3. 先迁移入口、生命周期、注册和侧隔离，再迁移业务逻辑。
-4. 重写网络、NBT/Capability、资源、AT/Mixin；每个阶段都保留启动日志。
-5. 构建、生成源码/资源、客户端、专用服务器和存档回归全部独立验收。
+1. 复制 Forge 基线业务代码，建立 Cleanroom 当前模板分支并锁定 Java 25、MCP、Cleanroom loader 和 artifact lock。
+2. 填写 `gradle.properties` 和 Blossom 模板，确认 `runClient`/`runServer`/`genSources`，先让空项目构建和启动。
+3. 为每个联动 Mod 解析 1.20.1 源构件和 1.12.2 目标构件，记录旧版生命周期、注册、侧、网络、Capability/NBT 和存档差异。
+4. 先迁移入口、生命周期、注册和侧隔离，再迁移业务逻辑；目标 API 放入独立 compat source set。
+5. 重写网络、NBT/Capability、资源、AT/Mixin；每个阶段保留构建、客户端和服务端日志。
+6. 执行无联动/目标版本/错误版本/两侧不对称/旧存档/网络组合，按证据状态更新矩阵。
 
 ## 重点陷阱
 

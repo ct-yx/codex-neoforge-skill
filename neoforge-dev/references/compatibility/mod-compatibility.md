@@ -21,7 +21,7 @@ SOURCE_GAME (loader + Minecraft + Java)
 
 ## 版本联动矩阵
 
-在迁移分支根目录维护 `compatibility-matrix.json`（模板见 [`compatibility-matrix.example.json`](compatibility-matrix.example.json)）。每个联动 Mod 至少有一行：
+在迁移分支根目录维护 `compatibility-matrix.json`（Schema v2 见 [`schema.json`](schema.json)，模板见 [`compatibility-matrix.example.json`](compatibility-matrix.example.json)）。构件解析版本、下载来源、许可证和 SHA-256 另记录在 `artifact-lock.json`（模板见 [`artifact-lock.example.json`](artifact-lock.example.json)）。每个联动 Mod 至少有一行：
 
 | 字段 | 要求 |
 | --- | --- |
@@ -36,13 +36,17 @@ SOURCE_GAME (loader + Minecraft + Java)
 | `runtime_checks` | 必须描述生命周期、线程、逻辑/物理侧、权威状态、网络和存档等实际行为检查 |
 | `adapter` | 适配层路径、source set、模块或明确的“无适配层原因” |
 | `evidence` | 对应版本的官方文档、Mod 源码/Javadoc、构件元数据、日志或测试报告 |
-| `status` | `planned`、`implemented`、`verified` 或 `blocked` |
+| `dependency_graph` | `requires`、`ordering`、`conflicts`；必须检查有向顺序环 |
+| `save_schema` / `network_schema` | 数据/网络格式、版本、迁移策略和证据 |
+| `fallback_behavior` | 缺失 Mod、错误版本、client/server 不对称时的明确行为 |
+| `evidence` | 对象化记录 `type`、来源、commit 和 observed/planned/blocked 状态 |
+| `status` | `planned` → `implemented` → `built` → `launched` → `verified`，或 `blocked` |
 
 ### 必须区分的依赖状态
 
 - **编译依赖**：需要目标版本的 API、接口或注解才能编译。
 - **运行依赖**：代码可编译，但目标实例运行时必须装载该 Mod。
-- **可选联动**：Mod 不存在时仍能启动；用目标 loader 的 optional metadata、条件注册或隔离 adapter 表达。
+- **可选联动**：Mod 不存在时仍能启动；用目标 loader 的 optional metadata、条件注册或隔离 adapter 表达。`mandatory=false` 只表示加载前不强制，不代表运行时 API 可直接调用。
 - **客户端专属**：渲染、屏幕、键位和模型类只能在物理客户端加载；专用服务端不能解析它们。
 - **数据/存档依赖**：配方、标签、世界生成、NBT、Attachment/Capability 或注册表 ID 变化时，必须有迁移/回退策略。
 
@@ -90,4 +94,4 @@ DATA_AND_SAVE                         # 配方/标签/存档/世界数据回归
 NETWORK_IF_USED                       # payload/message、方向、线程和校验
 ```
 
-证据必须标注是静态检查、构建、CI、客户端、专用服务器还是实际组合游戏测试；没有运行证据时状态只能是 `planned` 或 `implemented`，不能写成 `verified`。
+证据必须标注是静态检查、构建、CI、客户端、专用服务器还是实际组合游戏测试；`verified` 必须同时拥有 observed 的构建证据和 observed 的客户端/服务端/启动/GameTest 证据。只有静态检查时状态为 `implemented`，只有构建时为 `built`，只有启动时为 `launched`。

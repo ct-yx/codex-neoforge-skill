@@ -21,13 +21,16 @@ python3 -B neoforge-dev/scripts/build_doc_index.py --help >/dev/null
 python3 -B neoforge-dev/scripts/validate_loader.py --help >/dev/null
 python3 -B neoforge-dev/scripts/validate_structure.py --help >/dev/null
 python3 -B neoforge-dev/scripts/validate_compatibility.py --help >/dev/null
+python3 -B neoforge-dev/scripts/validate_dependency_graph.py --help >/dev/null
+python3 -B neoforge-dev/scripts/generate_compatibility_report.py --help >/dev/null
+python3 -B neoforge-dev/scripts/validate_matrix_fixtures.py
 python3 scripts/package.py
 unzip -t dist/neoforge-dev.zip
 git diff --check
 ```
 
 如果修改了脚本，请至少用临时 fixture 验证 NeoForge、Forge、Cleanroom 三种项目识别和结构检查；不要修改真实模组项目作为测试副作用。
-如果修改了兼容矩阵逻辑，请至少验证目标 Mod 存在、缺失、错误版本和 `verified` 证据不足四种情况。
+如果修改了兼容矩阵逻辑，请至少验证目标 Mod 存在、缺失、错误版本、依赖顺序循环、artifact checksum 和 `verified` 证据不足六种情况，并生成一份 Markdown 报告。
 
 ## 提交和发布
 

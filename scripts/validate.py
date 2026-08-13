@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import re
 import sys
+import json
 from pathlib import Path
 
 
@@ -33,6 +34,14 @@ REFERENCE_FILES = (
     SKILL_DIR / "references" / "migration" / "cleanroom-to-neoforge.md",
     SKILL_DIR / "references" / "compatibility" / "mod-compatibility.md",
     SKILL_DIR / "references" / "compatibility" / "compatibility-matrix.example.json",
+    SKILL_DIR / "references" / "compatibility" / "schema.json",
+    SKILL_DIR / "references" / "compatibility" / "artifact-lock.example.json",
+    SKILL_DIR / "references" / "compatibility" / "integration-template.md",
+    SKILL_DIR / "references" / "compatibility" / "loader-metadata" / "neoforge-1.21.1.md",
+    SKILL_DIR / "references" / "compatibility" / "loader-metadata" / "forge-1.20.1.md",
+    SKILL_DIR / "references" / "compatibility" / "loader-metadata" / "cleanroom-1.12.2.md",
+    SKILL_DIR / "references" / "testing" / "combination-matrix.md",
+    SKILL_DIR / "references" / "testing" / "loader-fixture-contract.md",
 )
 BUNDLED_SCRIPTS = (
     SKILL_DIR / "scripts" / "crawl_docs.py",
@@ -40,6 +49,9 @@ BUNDLED_SCRIPTS = (
     SKILL_DIR / "scripts" / "validate_loader.py",
     SKILL_DIR / "scripts" / "validate_structure.py",
     SKILL_DIR / "scripts" / "validate_compatibility.py",
+    SKILL_DIR / "scripts" / "validate_dependency_graph.py",
+    SKILL_DIR / "scripts" / "generate_compatibility_report.py",
+    SKILL_DIR / "scripts" / "validate_matrix_fixtures.py",
 )
 
 
@@ -122,9 +134,22 @@ def main() -> None:
         "runServerData",
         "87526dd760129b356e88f130550d646d4eb2fa31",
         "89314645e4e8b713688ba49ea6f84cbffd30cac7",
+        "935558879c66eede20591e0b21793cabcff3363b",
+        "807478aff106f33219b439296ed2792b171ccf69",
+        "d5dd0d1e53f6628ec6b16a68560f4fe854a9116b",
     ):
         if fragment not in reference:
             fail(f"official-docs.md is missing {fragment!r}")
+
+    for json_path in (
+        SKILL_DIR / "references" / "compatibility" / "schema.json",
+        SKILL_DIR / "references" / "compatibility" / "artifact-lock.example.json",
+        SKILL_DIR / "references" / "compatibility" / "compatibility-matrix.example.json",
+    ):
+        try:
+            json.loads(json_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            fail(f"invalid JSON {json_path.relative_to(ROOT)}: {exc}")
 
     skill = SKILL_FILE.read_text(encoding="utf-8")
     for fragment in (
@@ -141,6 +166,9 @@ def main() -> None:
         "compatibility-matrix.json",
         "联动 Mod",
         "六条有向迁移路径",
+        "schema.json",
+        "artifact-lock.example.json",
+        "verified",
     ):
         if fragment not in skill:
             fail(f"SKILL.md is missing {fragment!r}")
@@ -155,6 +183,7 @@ def main() -> None:
         "CONTRIBUTING.md",
         "compatibility-matrix",
         "联动 Mod",
+        "schema_version",
     ):
         if fragment not in readme:
             fail(f"README.md is missing {fragment!r}")

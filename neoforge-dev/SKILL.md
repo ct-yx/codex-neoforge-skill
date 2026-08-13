@@ -84,7 +84,7 @@ Java 命名、侧/线程、包结构和资源不变量见：
 
 迁移时必须同时迁移“本 Mod API”和“联动 Mod 在目标版本的运行逻辑”。不要因为 `mod_id` 相同或找到了同名方法，就假设其他 Mod 的注册、事件时序、Capability/Attachment、payload、数据格式、客户端入口和存档行为相同。
 
-先读取 [references/compatibility/mod-compatibility.md](references/compatibility/mod-compatibility.md) 和 [references/compatibility/compatibility-matrix.example.json](references/compatibility/compatibility-matrix.example.json)，在迁移分支维护 `compatibility-matrix.json`。每个联动 Mod 必须按有向路径记录：
+先读取 [references/compatibility/mod-compatibility.md](references/compatibility/mod-compatibility.md)、[references/compatibility/schema.json](references/compatibility/schema.json)、[references/compatibility/integration-template.md](references/compatibility/integration-template.md)、[references/compatibility/artifact-lock.example.json](references/compatibility/artifact-lock.example.json) 和 [references/compatibility/compatibility-matrix.example.json](references/compatibility/compatibility-matrix.example.json)，在迁移分支维护 `compatibility-matrix.json`。矩阵使用 `schema_version: 2`，构件解析版本和 SHA-256 另由 `artifact-lock.json` 锁定。每个联动 Mod 必须按有向路径记录：
 
 ```text
 SOURCE loader/Minecraft/Java
@@ -114,7 +114,8 @@ SOURCE loader/Minecraft/Java
 - 领域逻辑放在 `common/`；联动 Mod 的公共、客户端、服务端代码放在 `compat/<mod_id>/...`，按目标 loader/source set 隔离。
 - 用 `compile`、`runtime`、`compile_runtime`、`optional` 明确依赖范围；客户端联动不得被 dedicated server 加载。
 - 对每个联动 Mod 验证：无 Mod、目标版本、错误版本、client/server 不对称、数据/存档、网络（如使用）。
-- `verified` 必须同时有构建证据和组合运行证据；只有静态代码检查时状态为 `implemented`。
+- 读取对应的 [loader metadata 说明](references/compatibility/loader-metadata/)，不要把 NeoForge/Forge TOML 字段直接套到 Cleanroom 的 `mcmod.info`/模板依赖。
+- 状态按 `planned -> implemented -> built -> launched -> verified` 推进；目标构件未锁定、没有 observed 构建证据或没有 observed 客户端/服务端/启动/GameTest 组合证据时，不得标为 `verified`。目标缺失或版本不可用时使用 `blocked` 并写明降级。
 
 运行矩阵检查：
 
@@ -122,6 +123,13 @@ SOURCE loader/Minecraft/Java
 python3 neoforge-dev/scripts/validate_compatibility.py compatibility-matrix.json --json
 python3 neoforge-dev/scripts/validate_compatibility.py compatibility-matrix.json \
   --source neoforge:1.21.1 --target forge:1.20.1
+# 可选：同时核对目标项目的 Gradle、metadata 和已实现 adapter
+python3 neoforge-dev/scripts/validate_compatibility.py compatibility-matrix.json \
+  --target forge:1.20.1 --project /path/to/forge-project --json
+python3 neoforge-dev/scripts/validate_dependency_graph.py compatibility-matrix.json --json
+python3 neoforge-dev/scripts/generate_compatibility_report.py compatibility-matrix.json \
+  --output /tmp/compatibility-report.md
+python3 neoforge-dev/scripts/validate_matrix_fixtures.py
 ```
 
 ## 5. 实现与调试工作流
@@ -168,7 +176,7 @@ python3 neoforge-dev/scripts/validate_compatibility.py compatibility-matrix.json
 - 项目有 GameTest/JUnit 时运行相应测试；检查 `build/libs`、生成资源、日志和 crash report。
 - 把静态、构建、CI、客户端和 dedicated server 证据分开；环境不允许的验证标记为待完成，不宣称通过。
 
-完整检查表见 [references/common/testing-validation.md](references/common/testing-validation.md) 和 [references/baseline-gate.md](references/baseline-gate.md)。
+完整检查表见 [references/common/testing-validation.md](references/common/testing-validation.md)、[references/testing/combination-matrix.md](references/testing/combination-matrix.md)、[references/testing/loader-fixture-contract.md](references/testing/loader-fixture-contract.md) 和 [references/baseline-gate.md](references/baseline-gate.md)。
 
 ## 6. 辅助脚本
 

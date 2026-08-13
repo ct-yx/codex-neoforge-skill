@@ -10,6 +10,15 @@
 - 逐项重写 Forge 事件总线、注册、SimpleChannel、Capabilities、数据生成和 client Dist 代码。
 - 以目标项目实际任务和 1.21.1 版本文档为准，不能把当前文档线 API 直接复制进来。
 
+## 分阶段顺序
+
+1. 记录 Forge `mods.toml`、Java 17、ForgeGradle 和现有联动构件，建立 `source=forge:1.20.1 -> target=neoforge:1.21.1` 的 Schema v2 行和 artifact lock。
+2. 新建 NeoForge 1.21.1 模板并只解析目标 Gradle；先验证 Java 21、metadata 和空入口。
+3. 重写 `@Mod` 构造器、mod/game bus、DeferredRegister、并行生命周期与 `enqueueWork`；不要只替换包名。
+4. 将 SimpleChannel/Capabilities/SavedData/资源数据重做为目标 payload、Attachment/data component 和 1.21.1 数据流程。
+5. 按 `compat/<mod_id>/...` 隔离联动 API，验证注册完成、线程、侧和错误版本降级。
+6. 运行 `compileJava`、`build`、目标数据生成、`runClient`、`runServer` 和旧存档/网络回归。
+
 ## 联动 Mod 规则
 
 每个联动 Mod 单独建立 `source=forge:1.20.1 → target=neoforge:1.21.1` 矩阵行。目标 Mod 版本必须重新解析；同一个 `mod_id` 的 NeoForge 构件可能有不同注册事件、payload、Capability/Attachment 或客户端入口。
@@ -18,4 +27,4 @@
 
 ## 验证
 
-除本 Mod 的 `compileJava`/`build`/Data/client/server 外，还要执行：无联动、目标 Mod 存在、错误版本、client/server 不对称、存档/网络联动五组检查，并将证据写入矩阵。
+除本 Mod 的 `compileJava`/`build`/Data/client/server 外，还要执行：无联动、目标 Mod 存在、错误版本、client/server 不对称、存档/网络联动五组检查，并将对象化证据写入矩阵；状态按 `planned -> implemented -> built -> launched -> verified` 推进。

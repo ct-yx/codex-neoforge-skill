@@ -1,0 +1,45 @@
+{
+  "lock_version": 1,
+  "generated_at": null,
+  "artifacts": [
+    {
+      "artifact_id": "compat_mod-neoforge-1.21.1",
+      "mod_id": "compat_mod",
+      "loader": "neoforge",
+      "minecraft": "1.21.1",
+      "resolved_version": null,
+      "coordinate": "group:compat_mod:[version]",
+      "url": "https://example.invalid/compat-mod-neoforge.jar",
+      "repository": "placeholder",
+      "sha256": null,
+      "license": "SEE-DISTRIBUTION",
+      "evidence": "replace with a Modrinth, CurseForge, Maven, or project release record"
+    },
+    {
+      "artifact_id": "compat_mod-forge-1.20.1",
+      "mod_id": "compat_mod",
+      "loader": "forge",
+      "minecraft": "1.20.1",
+      "resolved_version": null,
+      "coordinate": "group:compat_mod:[version]",
+      "url": "https://example.invalid/compat-mod-forge.jar",
+      "repository": "placeholder",
+      "sha256": null,
+      "license": "SEE-DISTRIBUTION",
+      "evidence": "replace with a Modrinth, CurseForge, Maven, or project release record"
+    },
+    {
+      "artifact_id": "compat_mod-cleanroom-1.12.2",
+      "mod_id": "compat_mod",
+      "loader": "cleanroom",
+      "minecraft": "1.12.2",
+      "resolved_version": null,
+      "coordinate": "group:compat_mod:[version]",
+      "url": "https://example.invalid/compat-mod-cleanroom.jar",
+      "repository": "placeholder",
+      "sha256": null,
+      "license": "SEE-DISTRIBUTION",
+      "evidence": "replace with a Modrinth, CurseForge, Maven, or project release record"
+    }
+  ]
+}

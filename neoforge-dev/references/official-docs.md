@@ -7,7 +7,7 @@
 - 文档入口：[https://docs.neoforged.net/](https://docs.neoforged.net/)
 - 官方文档源码：[https://github.com/neoforged/Documentation](https://github.com/neoforged/Documentation)
 - 本次核对源码提交：`816c03d31ff7948179c7bd4a58d23bcfda09c18a`
-- 核对时间：2026-08-08
+- 核对时间：2026-08-14
 
 ## 版本与 Java
 
@@ -56,8 +56,8 @@
 ### Cleanroom 1.12.2
 
 - 官方 Wiki 源码：[CleanroomMC/Website](https://github.com/CleanroomMC/Website)，提交 `89314645e4e8b713688ba49ea6f84cbffd30cac7`
-- 模板：[CleanroomMC/CleanroomModTemplate](https://github.com/CleanroomMC/CleanroomModTemplate)，提交 `49d07a16035b4da77786bd00a4b2f372d30ecdb7`
-- 开发环境：[CleanroomMC/ForgeDevEnv](https://github.com/CleanroomMC/ForgeDevEnv)，提交 `16d82d28244508f419f62718605213148da1a5f3`
-- 构建插件：[CleanroomMC/CleanroomGradle](https://github.com/CleanroomMC/CleanroomGradle)，提交 `0eecbbdc52b4c0e3917ccd7a198f560c43987dec`
+- 模板：[CleanroomMC/CleanroomModTemplate](https://github.com/CleanroomMC/CleanroomModTemplate)，提交 `935558879c66eede20591e0b21793cabcff3363b`
+- 开发环境：[CleanroomMC/ForgeDevEnv](https://github.com/CleanroomMC/ForgeDevEnv)，提交 `807478aff106f33219b439296ed2792b171ccf69`
+- 构建插件：[CleanroomMC/CleanroomGradle](https://github.com/CleanroomMC/CleanroomGradle)，提交 `d5dd0d1e53f6628ec6b16a68560f4fe854a9116b`
 - 已核对：Forge 模组开发 wiki、Cleanroom porting、Unimined/Blossom 模板、gradle.properties、AT、CleanMix/MixinBooter、旧版生命周期、逻辑/物理侧、block update flags 和类加载器陷阱。
-- 版本锚点：Minecraft 1.12.2；审计模板使用 MCP stable `39-1.12`、Cleanroom `0.6.6-alpha`、`modImplementation`/`modRuntimeOnly`、`runClient`/`runServer`/`genSources`；Java toolchain 以模板和 CI 为准（审计模板为 Java 25）。
+- 版本锚点：Minecraft 1.12.2；当前模板使用 MCP stable `39-1.12`、Cleanroom `0.6.10-alpha`、`modImplementation`/`modRuntimeOnly`、`runClient`/`runServer`/`genSources` 和 Java 25 toolchain；版本更新时以模板和 CI 为准。

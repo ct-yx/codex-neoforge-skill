@@ -18,6 +18,8 @@
 
 ## 阶段顺序
 
-1. 建立 NeoForge 1.21.1 空项目和公共业务层。
-2. 逐个迁移联动 Mod 的目标构件和 adapter，再迁移本 Mod 功能。
-3. 完成资源、数据生成、网络、存档和服务器回归。
+1. 记录 Cleanroom Java 25/Unimined、`mcmod.info`、FML 生命周期和每个旧版联动构件，建立 Schema v2 矩阵。
+2. 建立 NeoForge 1.21.1 空项目和公共业务层，先通过 Java 21、metadata、`compileJava`/`build`。
+3. 逐个迁移联动 Mod 的目标构件和 adapter：旧注册/事件/Capability/NBT/网络/客户端入口分别映射到目标语义。
+4. 完成资源、数据生成、payload/StreamCodec、Attachment/data component、存档迁移和 dedicated server 回归。
+5. 执行无联动/目标版本/错误版本/侧不对称/存档/网络组合；将证据写入矩阵，避免把静态编译标为 verified。

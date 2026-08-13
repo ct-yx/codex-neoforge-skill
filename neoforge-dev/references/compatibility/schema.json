@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ct-yx/codex-neoforge-skill/schema/compatibility-matrix-v2.json",
+  "title": "Codex Minecraft Mod compatibility matrix",
+  "type": "object",
+  "required": ["schema_version", "project_mod_id", "entries"],
+  "properties": {
+    "schema_version": {"const": 2},
+    "project_mod_id": {"type": "string", "pattern": "^[a-z][a-z0-9_]{1,63}$"},
+    "artifact_lock": {"type": ["string", "null"]},
+    "entries": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/entry"}
+    }
+  },
+  "$defs": {
+    "endpoint": {
+      "type": "object",
+      "required": ["loader", "minecraft", "java"],
+      "properties": {
+        "loader": {"enum": ["neoforge", "forge", "cleanroom"]},
+        "minecraft": {"type": "string", "pattern": "^\\d+\\.\\d+(?:\\.\\d+)?$"},
+        "java": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "artifact": {
+      "type": ["string", "null"],
+      "description": "Modrinth/CurseForge/Maven URL or a local artifact reference"
+    },
+    "sha256": {
+      "type": ["string", "null"],
+      "pattern": "^[A-Fa-f0-9]{64}$"
+    },
+    "metadata": {
+      "type": "object",
+      "required": ["mod_id", "mandatory", "version_range", "ordering", "side"],
+      "properties": {
+        "mod_id": {"type": "string", "pattern": "^[a-z][a-z0-9_]{1,63}$"},
+        "mandatory": {"type": "boolean"},
+        "version_range": {"type": "string"},
+        "ordering": {"enum": ["BEFORE", "AFTER", "NONE"]},
+        "side": {"enum": ["CLIENT", "SERVER", "BOTH"]},
+        "raw_fields": {"type": "object"}
+      },
+      "additionalProperties": false
+    },
+    "dependency_graph": {
+      "type": "object",
+      "required": ["requires", "ordering", "conflicts"],
+      "properties": {
+        "requires": {"type": "array", "items": {"type": "string"}},
+        "ordering": {"type": "array", "items": {"type": "string"}},
+        "conflicts": {"type": "array", "items": {"type": "string"}}
+      },
+      "additionalProperties": false
+    },
+    "schema_note": {
+      "type": "object",
+      "required": ["format", "version", "migration"],
+      "properties": {
+        "format": {"type": "string"},
+        "version": {"type": "string"},
+        "migration": {"type": "string"},
+        "evidence": {"type": "array", "items": {"type": "string"}}
+      },
+      "additionalProperties": false
+    },
+    "fallback": {
+      "type": "object",
+      "required": ["missing_mod", "wrong_version", "side_mismatch"],
+      "properties": {
+        "missing_mod": {"type": "string"},
+        "wrong_version": {"type": "string"},
+        "side_mismatch": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "evidence": {
+      "type": "object",
+      "required": ["type", "source", "status"],
+      "properties": {
+        "type": {"enum": ["official_docs", "source", "javadoc", "artifact", "static", "build", "launch", "client", "server", "game_test", "save", "network", "manual"]},
+        "source": {"type": "string", "minLength": 1},
+        "status": {"enum": ["observed", "planned", "blocked"]},
+        "commit": {"type": ["string", "null"]},
+        "notes": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "entry": {
+      "type": "object",
+      "required": [
+        "source", "target", "mod_id", "source_version_range", "target_version_range",
+        "resolved_source_version", "resolved_target_version", "source_artifact", "target_artifact",
+        "source_sha256", "target_sha256", "license", "artifact_repository", "maven_version_range",
+        "dependency_scope", "sides", "loader_metadata", "integration_surfaces", "runtime_checks",
+        "adapter", "dependency_graph", "save_schema", "network_schema", "fallback_behavior", "evidence", "status"
+      ],
+      "properties": {
+        "source": {"$ref": "#/$defs/endpoint"},
+        "target": {"$ref": "#/$defs/endpoint"},
+        "mod_id": {"type": "string", "pattern": "^[a-z][a-z0-9_]{1,63}$"},
+        "source_version_range": {"type": "string", "minLength": 1},
+        "target_version_range": {"type": "string", "minLength": 1},
+        "resolved_source_version": {"type": ["string", "null"]},
+        "resolved_target_version": {"type": ["string", "null"]},
+        "source_artifact": {"$ref": "#/$defs/artifact"},
+        "target_artifact": {"$ref": "#/$defs/artifact"},
+        "source_artifact_ref": {"type": ["string", "null"]},
+        "target_artifact_ref": {"type": ["string", "null"]},
+        "source_sha256": {"$ref": "#/$defs/sha256"},
+        "target_sha256": {"$ref": "#/$defs/sha256"},
+        "license": {"type": "string", "minLength": 1},
+        "artifact_repository": {"type": "string", "minLength": 1},
+        "maven_version_range": {"type": "string"},
+        "dependency_scope": {"enum": ["compile", "runtime", "compile_runtime", "optional"]},
+        "sides": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["common", "server", "client"]}},
+        "loader_metadata": {"$ref": "#/$defs/metadata"},
+        "integration_surfaces": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["registry", "event", "capability", "attachment", "payload", "command", "data", "render", "storage", "config", "mixin", "access_transformer"]}},
+        "runtime_checks": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "adapter": {"type": "string", "minLength": 1},
+        "dependency_graph": {"$ref": "#/$defs/dependency_graph"},
+        "save_schema": {"$ref": "#/$defs/schema_note"},
+        "network_schema": {"$ref": "#/$defs/schema_note"},
+        "fallback_behavior": {"$ref": "#/$defs/fallback"},
+        "evidence": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/evidence"}},
+        "status": {"enum": ["planned", "implemented", "built", "launched", "verified", "blocked"]}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

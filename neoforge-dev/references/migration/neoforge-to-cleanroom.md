@@ -28,8 +28,8 @@
 
 ## 阶段顺序
 
-1. 复制业务逻辑，建立 Cleanroom 模板和独立 compat adapter。
-2. 先让目标 Gradle 和空入口运行，再迁移生命周期、注册和侧隔离。
-3. 逐个迁移联动 Mod：目标构件 → API/运行语义 → adapter → 缺失/错版本降级。
-4. 重写网络、NBT/Capability、资源、AT/Mixin 和存档迁移。
-5. 运行目标客户端、专用服务器、无联动/有联动/错版本组合测试。
+1. 复制业务逻辑，建立 Cleanroom 当前模板分支，锁定 Java 25、Unimined/MCP、Cleanroom loader 和 artifact lock。
+2. 让目标 Gradle、`genSources`、`runClient`/`runServer` 的空入口运行，再迁移 `mcmod.info`、FML 生命周期和侧隔离。
+3. 为每个联动 Mod 分别确认 1.12.2 构件、模板依赖、旧事件/Capability/NBT/网络语义和 client/server 入口。
+4. 重写网络、NBT/Capability、资源、AT/Mixin 和存档迁移；不把现代 payload、Attachment 或 data component 带入目标。
+5. 运行无联动/目标版本/错误版本/两侧不对称/旧存档组合；只有 observed 构建和客户端/服务端运行证据齐全才标为 `verified`。

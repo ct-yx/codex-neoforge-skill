@@ -49,6 +49,13 @@ BASELINE_GATE:
 - [版本审计记录](neoforge-dev/references/official-docs.md)
 - [跨版本 Mod 联动规范](neoforge-dev/references/compatibility/mod-compatibility.md)
 - [联动矩阵模板](neoforge-dev/references/compatibility/compatibility-matrix.example.json)
+- [联动矩阵 Schema v2](neoforge-dev/references/compatibility/schema.json)
+- [构件锁定模板](neoforge-dev/references/compatibility/artifact-lock.example.json)
+- [联动运行语义模板](neoforge-dev/references/compatibility/integration-template.md)
+- [组合测试矩阵](neoforge-dev/references/testing/combination-matrix.md)
+- [Loader fixture 合约](neoforge-dev/references/testing/loader-fixture-contract.md)
+
+矩阵根节点使用 `schema_version: 2`，联动构件通过 `artifact-lock.json` 锁定解析版本和 SHA-256。
 
 ## 安装
 
@@ -143,6 +150,12 @@ python3 neoforge-dev/scripts/validate_structure.py /path/to/mod-project --loader
 
 # 校验迁移分支的跨版本 Mod 联动矩阵
 python3 neoforge-dev/scripts/validate_compatibility.py compatibility-matrix.json --json
+python3 neoforge-dev/scripts/validate_compatibility.py compatibility-matrix.json \
+  --target forge:1.20.1 --project /path/to/forge-project --json
+python3 neoforge-dev/scripts/validate_dependency_graph.py compatibility-matrix.json --json
+python3 neoforge-dev/scripts/generate_compatibility_report.py compatibility-matrix.json \
+  --output /tmp/compatibility-report.md
+python3 neoforge-dev/scripts/validate_matrix_fixtures.py
 ```
 
 ### 抓取和索引文档
@@ -191,13 +204,16 @@ python3 -B neoforge-dev/scripts/build_doc_index.py --help
 python3 -B neoforge-dev/scripts/validate_loader.py --help
 python3 -B neoforge-dev/scripts/validate_structure.py --help
 python3 -B neoforge-dev/scripts/validate_compatibility.py --help
+python3 -B neoforge-dev/scripts/validate_dependency_graph.py --help
+python3 -B neoforge-dev/scripts/generate_compatibility_report.py --help
+python3 -B neoforge-dev/scripts/validate_matrix_fixtures.py
 python3 scripts/package.py
 unzip -t dist/neoforge-dev.zip
 ```
 
 打包产物：`dist/neoforge-dev.zip` 和 `dist/neoforge-dev.zip.sha256`。ZIP 保留顶层 `neoforge-dev/`，可直接解压到 `$CODEX_HOME/skills`。
 
-`compatibility-matrix.json` 是迁移项目的工作文件，不应把示例中的 `[source-version]`/`[target-version]` 直接当作真实依赖；必须替换为已核对的目标 Mod 构件、版本范围和证据。
+`compatibility-matrix.json` 使用 Schema v2；`artifact-lock.json` 记录解析版本、来源、许可证和 SHA-256。示例中的 `[source-version]`/`[target-version]`、`example.invalid` 和 `planned` 只能作为模板，必须替换为已核对的目标 Mod 构件、版本范围和证据。只有 observed 构建证据与组合运行证据同时存在时，才能标为 `verified`。
 
 ## 官方资料与适配来源
 

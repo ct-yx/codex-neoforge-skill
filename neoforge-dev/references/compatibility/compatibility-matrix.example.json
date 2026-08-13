@@ -1,29 +1,34 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "project_mod_id": "example_mod",
+  "artifact_lock": "artifact-lock.example.json",
   "entries": [
     {
-      "source": {
-        "loader": "neoforge",
-        "minecraft": "1.21.1",
-        "java": "21"
-      },
-      "target": {
-        "loader": "forge",
-        "minecraft": "1.20.1",
-        "java": "17"
-      },
+      "source": {"loader": "neoforge", "minecraft": "1.21.1", "java": "21"},
+      "target": {"loader": "forge", "minecraft": "1.20.1", "java": "17"},
       "mod_id": "compat_mod",
       "source_version_range": "[source-version]",
       "target_version_range": "[target-version]",
+      "resolved_source_version": null,
+      "resolved_target_version": null,
       "source_artifact": "https://example.invalid/source-artifact",
       "target_artifact": "https://example.invalid/target-artifact",
+      "source_artifact_ref": "compat_mod-neoforge-1.21.1",
+      "target_artifact_ref": "compat_mod-forge-1.20.1",
+      "source_sha256": null,
+      "target_sha256": null,
+      "license": "SEE-DISTRIBUTION",
+      "artifact_repository": "placeholder",
+      "maven_version_range": "[target-version]",
       "dependency_scope": "optional",
       "sides": ["common", "server", "client"],
       "loader_metadata": {
+        "mod_id": "compat_mod",
         "mandatory": false,
+        "version_range": "[target-version]",
         "ordering": "AFTER",
-        "side": "BOTH"
+        "side": "BOTH",
+        "raw_fields": {"modId": "compat_mod", "mandatory": false, "versionRange": "[target-version]", "ordering": "AFTER", "side": "BOTH"}
       },
       "integration_surfaces": ["registry", "event", "data"],
       "runtime_checks": [
@@ -33,10 +38,18 @@
         "旧存档中的注册 ID 和 NBT 字段可读取"
       ],
       "adapter": "src/main/java/com/example/compat/compat_mod/forge1201",
+      "dependency_graph": {"requires": [], "ordering": ["example_mod AFTER compat_mod"], "conflicts": []},
+      "save_schema": {"format": "NBT", "version": "TODO", "migration": "TODO", "evidence": []},
+      "network_schema": {"format": "none", "version": "TODO", "migration": "TODO", "evidence": []},
+      "fallback_behavior": {
+        "missing_mod": "核心功能继续运行并记录联动关闭",
+        "wrong_version": "不加载目标 API 并记录实际版本",
+        "side_mismatch": "只在允许侧加载 adapter，dedicated server 不解析客户端类"
+      },
       "evidence": [
-        "目标版本 Mod API/Javadoc URL + commit",
-        "组合启动日志路径",
-        "联动 GameTest 或手工回归记录"
+        {"type": "official_docs", "source": "目标版本 Mod API/Javadoc URL + commit", "status": "planned", "commit": null, "notes": ""},
+        {"type": "build", "source": "目标分支构建日志路径", "status": "planned", "commit": null, "notes": ""},
+        {"type": "launch", "source": "组合启动日志路径", "status": "planned", "commit": null, "notes": ""}
       ],
       "status": "planned"
     }

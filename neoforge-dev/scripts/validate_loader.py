@@ -109,6 +109,13 @@ def detect_project(root: Path) -> dict[str, object]:
         for pattern in java_patterns:
             for match in pattern.finditer(text):
                 version_candidates.append({"value": match.group(1), "file": relative, "kind": "java"})
+        # Cleanroom's current Unimined template declares the game version as
+        # `unimined.minecraft { version "1.12.2" }`, unlike the modern
+        # minecraft_version Gradle property used by NeoForge/Forge.
+        if "unimined.minecraft" in text:
+            match = re.search(r"unimined\.minecraft\s*\{[\s\S]{0,500}?\bversion\s*[=:]?\s*[\"']([0-9]+(?:\.[0-9]+){1,2})", text)
+            if match:
+                version_candidates.append({"value": match.group(1), "file": relative, "kind": "minecraft"})
 
     def first_kind(kind: str) -> str | None:
         return next((str(item["value"]) for item in version_candidates if item["kind"] == kind), None)

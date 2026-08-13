@@ -25,8 +25,41 @@ jobs:
           python3 neoforge-dev/scripts/validate_loader.py --help >/dev/null
           python3 neoforge-dev/scripts/validate_structure.py --help >/dev/null
           python3 neoforge-dev/scripts/validate_compatibility.py --help >/dev/null
+          python3 neoforge-dev/scripts/validate_dependency_graph.py --help >/dev/null
+          python3 neoforge-dev/scripts/generate_compatibility_report.py --help >/dev/null
+          python3 neoforge-dev/scripts/validate_matrix_fixtures.py
       - name: Validate compatibility example
         run: python3 neoforge-dev/scripts/validate_compatibility.py neoforge-dev/references/compatibility/compatibility-matrix.example.json --json
+      - name: Validate compatibility dependency graph
+        run: python3 neoforge-dev/scripts/validate_dependency_graph.py neoforge-dev/references/compatibility/compatibility-matrix.example.json --json
+      - name: Validate matrix fixtures
+        run: python3 neoforge-dev/scripts/validate_matrix_fixtures.py
+      - name: Validate loader fixture contract
+        run: |
+          fixture_root="$(mktemp -d)"
+          for loader in neo forge clean; do
+            mkdir -p "$fixture_root/$loader/src/main/java/com/example/mod" "$fixture_root/$loader/src/main/resources/META-INF"
+            : > "$fixture_root/$loader/gradlew"
+            : > "$fixture_root/$loader/settings.gradle"
+            : > "$fixture_root/$loader/src/main/java/com/example/mod/Example.java"
+          done
+          printf "plugins { id 'net.neoforged.moddev' version '2.0.0' }\njava { toolchain { languageVersion = JavaLanguageVersion.of(21) } }\n" > "$fixture_root/neo/build.gradle"
+          printf 'minecraft_version=1.21.1\n' > "$fixture_root/neo/gradle.properties"
+          : > "$fixture_root/neo/src/main/resources/META-INF/neoforge.mods.toml"
+          printf "plugins { id 'net.minecraftforge.gradle' version '6.0.25' }\njava { toolchain { languageVersion = JavaLanguageVersion.of(17) } }\n" > "$fixture_root/forge/build.gradle"
+          printf 'minecraft_version=1.20.1\n' > "$fixture_root/forge/gradle.properties"
+          : > "$fixture_root/forge/src/main/resources/META-INF/mods.toml"
+          printf "plugins { id 'xyz.wagyourtail.unimined' version '1.4.36-kappa' }\njava { toolchain { languageVersion = JavaLanguageVersion.of(25) } }\nunimined.minecraft { version '1.12.2' }\n" > "$fixture_root/clean/build.gradle"
+          printf 'mod_id=example\nroot_package=com.example\nmod_version=1.0.0\n' > "$fixture_root/clean/gradle.properties"
+          : > "$fixture_root/clean/src/main/resources/mcmod.info"
+          python3 neoforge-dev/scripts/validate_loader.py "$fixture_root/neo" --expect-loader neoforge --expect-minecraft 1.21.1
+          python3 neoforge-dev/scripts/validate_loader.py "$fixture_root/forge" --expect-loader forge --expect-minecraft 1.20.1
+          python3 neoforge-dev/scripts/validate_loader.py "$fixture_root/clean" --expect-loader cleanroom --expect-minecraft 1.12.2
+          python3 neoforge-dev/scripts/validate_structure.py "$fixture_root/neo" --loader neoforge
+          python3 neoforge-dev/scripts/validate_structure.py "$fixture_root/forge" --loader forge
+          python3 neoforge-dev/scripts/validate_structure.py "$fixture_root/clean" --loader cleanroom
+      - name: Generate compatibility report
+        run: python3 neoforge-dev/scripts/generate_compatibility_report.py neoforge-dev/references/compatibility/compatibility-matrix.example.json --output /tmp/compatibility-report.md
       - name: Build release archive
         run: python3 scripts/package.py
       - name: Inspect archive

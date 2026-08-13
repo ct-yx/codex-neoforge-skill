@@ -19,13 +19,13 @@
 
 ## 分阶段顺序
 
-1. 复制基线并锁定依赖、Java、mappings。
+1. 复制基线并锁定依赖、Java、mappings；为每个联动 Mod 填写 Schema v2 矩阵和 artifact lock。
 2. 让 Gradle 只解析 Forge 1.20.1；此阶段不改业务代码。
-3. 重建入口、注册和事件；每一步运行 `compileJava`。
-4. 迁移网络和持久数据，明确服务端权威与 wire compatibility。
-5. 迁移资源、数据生成、客户端注册和渲染。
-6. 运行 `build`、数据生成、`runClient`、`runServer` 并回归功能。
-7. 对联动 Mod 运行无联动、目标版本、错误版本、两侧不对称、存档和网络组合测试；只有有运行证据才标为 `verified`。
+3. 重建入口、metadata、注册和事件；每一步运行 `compileJava`，核对 `mandatory/versionRange/ordering/side`。
+4. 迁移网络和持久数据，明确服务端权威、SimpleChannel wire schema、Capability/SavedData 和旧存档策略。
+5. 迁移资源、数据生成、客户端注册和渲染；确保 client adapter 不进入 dedicated server。
+6. 运行 `build`、数据生成、`runClient`、`runServer` 并保留日志、产物和 crash report。
+7. 对每个联动 Mod 运行无联动、目标版本、错误版本、两侧不对称、存档和网络组合测试；只有 observed 构建与组合运行证据齐全才标为 `verified`。
 
 ## 禁止事项
 
