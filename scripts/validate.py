@@ -27,12 +27,19 @@ REFERENCE_FILES = (
     SKILL_DIR / "references" / "cleanroom" / "1.12.2.md",
     SKILL_DIR / "references" / "migration" / "neoforge-to-forge.md",
     SKILL_DIR / "references" / "migration" / "forge-to-cleanroom.md",
+    SKILL_DIR / "references" / "migration" / "neoforge-to-cleanroom.md",
+    SKILL_DIR / "references" / "migration" / "forge-to-neoforge.md",
+    SKILL_DIR / "references" / "migration" / "cleanroom-to-forge.md",
+    SKILL_DIR / "references" / "migration" / "cleanroom-to-neoforge.md",
+    SKILL_DIR / "references" / "compatibility" / "mod-compatibility.md",
+    SKILL_DIR / "references" / "compatibility" / "compatibility-matrix.example.json",
 )
 BUNDLED_SCRIPTS = (
     SKILL_DIR / "scripts" / "crawl_docs.py",
     SKILL_DIR / "scripts" / "build_doc_index.py",
     SKILL_DIR / "scripts" / "validate_loader.py",
     SKILL_DIR / "scripts" / "validate_structure.py",
+    SKILL_DIR / "scripts" / "validate_compatibility.py",
 )
 
 
@@ -88,7 +95,7 @@ def main() -> None:
 
     interface = OPENAI_FILE.read_text(encoding="utf-8")
     required_fragments = (
-        'display_name: "NeoForge 模组开发"',
+        'display_name: "Minecraft 模组开发"',
         "short_description:",
         'default_prompt: "使用 $neoforge-dev',
     )
@@ -130,6 +137,10 @@ def main() -> None:
         "Cleanroom 1.12.2",
         "validate_loader.py",
         "validate_structure.py",
+        "validate_compatibility.py",
+        "compatibility-matrix.json",
+        "联动 Mod",
+        "六条有向迁移路径",
     ):
         if fragment not in skill:
             fail(f"SKILL.md is missing {fragment!r}")
@@ -142,6 +153,8 @@ def main() -> None:
         "Cleanroom 1.12.2",
         "releases/latest/download/neoforge-dev.zip",
         "CONTRIBUTING.md",
+        "compatibility-matrix",
+        "联动 Mod",
     ):
         if fragment not in readme:
             fail(f"README.md is missing {fragment!r}")

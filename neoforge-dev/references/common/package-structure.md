@@ -16,6 +16,8 @@ project/
 │   ├── data/                 # datagen providers
 │   ├── world/                # worldgen、attachment 等
 │   └── client/               # client-only 注册、屏幕、渲染
+├── compat/<compat_mod_id>/   # 目标 Mod adapter，按 common/client/server 分包
+├── compatibility-matrix.json # 迁移分支的联动版本与运行证据
 ├── src/main/resources/
 │   ├── META-INF/neoforge.mods.toml
 │   ├── assets/<mod_id>/      # lang、models、textures、音效等
@@ -63,6 +65,8 @@ src/main/resource-templates/
 ```
 
 Cleanroom 模板还使用 `gradle.properties` 驱动的 Blossom 替换、`use_access_transformer`、`use_mixins` 和 `is_coremod` 开关。只有迁移任务解锁后才建立这些文件。
+
+联动 adapter 不得放进无条件加载的 common 入口；使用目标版本 source set、模块、Dist 隔离或可选依赖 metadata，确保目标 Mod 缺失时本 Mod 仍能启动。
 
 ## 结构选择算法
 

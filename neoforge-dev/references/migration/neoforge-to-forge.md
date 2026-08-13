@@ -2,6 +2,8 @@
 
 本指南只能在 `baseline-gate.md` 解锁后使用。目标明确后建立独立迁移分支，保留 NeoForge 基线可构建。
 
+如果存在联动 Mod，必须同时读取 [跨版本联动规范](../compatibility/mod-compatibility.md)，为 `source=neoforge:1.21.1 → target=forge:1.20.1` 的每个 Mod 建立矩阵行。目标 Mod 版本、事件/注册/网络/数据语义和组合运行证据都必须独立确认。
+
 ## 差异表
 
 | 领域 | NeoForge 1.21.1 | Forge 1.20.1 | 移植动作 |
@@ -23,6 +25,7 @@
 4. 迁移网络和持久数据，明确服务端权威与 wire compatibility。
 5. 迁移资源、数据生成、客户端注册和渲染。
 6. 运行 `build`、数据生成、`runClient`、`runServer` 并回归功能。
+7. 对联动 Mod 运行无联动、目标版本、错误版本、两侧不对称、存档和网络组合测试；只有有运行证据才标为 `verified`。
 
 ## 禁止事项
 

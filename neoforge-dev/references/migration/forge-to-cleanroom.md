@@ -2,6 +2,8 @@
 
 本指南只能在基线门控解锁、且用户明确指定 Cleanroom 1.12.2 后使用。Cleanroom 是 1.12.2 生态，不是 Forge 1.20.1 的小版本升级；应视为重新适配目标平台。
 
+如果存在联动 Mod，必须为 `source=forge:1.20.1 → target=cleanroom:1.12.2` 的每个 Mod 建立矩阵行，分别验证目标构件和旧版运行逻辑；不能把 Forge 1.20.1 构件塞进 Cleanroom 运行时。
+
 ## 差异表
 
 | 领域 | Forge 1.20.1 | Cleanroom 1.12.2 | 移植动作 |

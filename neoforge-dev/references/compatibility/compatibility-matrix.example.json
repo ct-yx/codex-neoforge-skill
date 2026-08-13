@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "project_mod_id": "example_mod",
+  "entries": [
+    {
+      "source": {
+        "loader": "neoforge",
+        "minecraft": "1.21.1",
+        "java": "21"
+      },
+      "target": {
+        "loader": "forge",
+        "minecraft": "1.20.1",
+        "java": "17"
+      },
+      "mod_id": "compat_mod",
+      "source_version_range": "[source-version]",
+      "target_version_range": "[target-version]",
+      "source_artifact": "https://example.invalid/source-artifact",
+      "target_artifact": "https://example.invalid/target-artifact",
+      "dependency_scope": "optional",
+      "sides": ["common", "server", "client"],
+      "loader_metadata": {
+        "mandatory": false,
+        "ordering": "AFTER",
+        "side": "BOTH"
+      },
+      "integration_surfaces": ["registry", "event", "data"],
+      "runtime_checks": [
+        "注册完成后再读取 compat_mod 对象",
+        "服务端保存权威状态，客户端只同步展示",
+        "compat_mod 缺失或版本不满足时禁用 adapter 并继续启动",
+        "旧存档中的注册 ID 和 NBT 字段可读取"
+      ],
+      "adapter": "src/main/java/com/example/compat/compat_mod/forge1201",
+      "evidence": [
+        "目标版本 Mod API/Javadoc URL + commit",
+        "组合启动日志路径",
+        "联动 GameTest 或手工回归记录"
+      ],
+      "status": "planned"
+    }
+  ]
+}

@@ -24,6 +24,9 @@ jobs:
           python3 neoforge-dev/scripts/build_doc_index.py --help >/dev/null
           python3 neoforge-dev/scripts/validate_loader.py --help >/dev/null
           python3 neoforge-dev/scripts/validate_structure.py --help >/dev/null
+          python3 neoforge-dev/scripts/validate_compatibility.py --help >/dev/null
+      - name: Validate compatibility example
+        run: python3 neoforge-dev/scripts/validate_compatibility.py neoforge-dev/references/compatibility/compatibility-matrix.example.json --json
       - name: Build release archive
         run: python3 scripts/package.py
       - name: Inspect archive

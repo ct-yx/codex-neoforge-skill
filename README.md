@@ -15,8 +15,9 @@
 | 项目识别 | 从 Gradle、元数据和目录识别 loader、Minecraft、Java、构建插件和资源布局 |
 | 代码规范 | Java 命名、包结构、common/client/server 隔离、线程与网络输入校验提示词 |
 | NeoForge 基线 | 1.21.1 的注册、事件、payload、资源、数据生成、存储、Mixin/AT 和验收流程 |
-| 后续迁移 | Forge 1.20.1 与 Cleanroom 1.12.2 的版本差异、项目结构和分阶段迁移指南 |
-| 辅助脚本 | 文档爬取、标题/关键词索引、loader 识别、项目结构检查 |
+| 后续迁移 | 三个版本之间六条有向迁移路径；每条路径独立处理 API、构建、存档和联动 Mod 运行逻辑 |
+| 联动兼容 | 按源/目标游戏版本记录其他 Mod 构件、版本范围、运行语义、适配层、降级和组合测试证据 |
+| 辅助脚本 | 文档爬取、标题/关键词索引、loader 识别、项目结构检查、联动矩阵检查 |
 | 交付验证 | compile、build、数据生成、客户端/专用服务器、GameTest/JUnit 和日志证据记录 |
 
 ## 基线门控
@@ -30,7 +31,7 @@ BASELINE_GATE:
 只有基线验收完成且用户明确指定目标加载器和版本后，才进入移植任务。
 ```
 
-因此，在 NeoForge 1.21.1 尚未完成 `compileJava`、`build`、数据生成、客户端/专用服务器和资源验收前，Codex 不会把 Forge 或 Cleanroom API 替换进基线代码。完整规则见 [`neoforge-dev/references/baseline-gate.md`](neoforge-dev/references/baseline-gate.md)。
+因此，在 NeoForge 1.21.1 尚未完成 `compileJava`、`build`、数据生成、客户端/专用服务器和资源验收前，Codex 不会把 Forge 或 Cleanroom API、联动 Mod 目标构件或适配器替换进基线代码。完整规则见 [`neoforge-dev/references/baseline-gate.md`](neoforge-dev/references/baseline-gate.md)。
 
 ## 支持的版本线
 
@@ -46,6 +47,8 @@ BASELINE_GATE:
 - [Forge 1.20.1](neoforge-dev/references/forge/1.20.1.md)
 - [Cleanroom 1.12.2](neoforge-dev/references/cleanroom/1.12.2.md)
 - [版本审计记录](neoforge-dev/references/official-docs.md)
+- [跨版本 Mod 联动规范](neoforge-dev/references/compatibility/mod-compatibility.md)
+- [联动矩阵模板](neoforge-dev/references/compatibility/compatibility-matrix.example.json)
 
 ## 安装
 
@@ -105,6 +108,7 @@ Set-Location codex-neoforge-skill
 使用 $neoforge-dev 检查当前项目的 NeoForge 1.21.1 注册、资源和数据生成是否一致。
 使用 $neoforge-dev 按 BASELINE_GATE 记录当前基线验收状态，不要开始 Forge 移植。
 基线已验收；使用 $neoforge-dev 将当前模组迁移到 Forge 1.20.1，并逐阶段验证。
+基线已验收；使用 $neoforge-dev 将当前模组从 NeoForge 1.21.1 迁移到 Forge 1.20.1，并检查联动 Mod 的目标版本运行逻辑。
 ```
 
 涉及 NeoForge/Forge/Cleanroom 模组开发、构建、数据生成、版本兼容、迁移或崩溃排查时，也可以让 Codex 自动触发。
@@ -117,6 +121,7 @@ Set-Location codex-neoforge-skill
 4. 沿用现有包结构和注册体系，隔离 common、server、client 代码。
 5. 同步 Java 源码、资源、数据生成和测试，避免跨 loader API 混用。
 6. 运行实际存在的 Gradle 任务，再报告命令、产物、日志和未验证项。
+7. 有联动 Mod 时，先填写 `compatibility-matrix.json`，再分别验证无联动、目标版本、错误版本和 client/server 不对称组合。
 
 ## 辅助脚本
 
@@ -135,6 +140,9 @@ python3 neoforge-dev/scripts/validate_loader.py /path/to/mod-project \
 ```bash
 python3 neoforge-dev/scripts/validate_structure.py /path/to/mod-project --loader auto
 python3 neoforge-dev/scripts/validate_structure.py /path/to/mod-project --loader forge --json
+
+# 校验迁移分支的跨版本 Mod 联动矩阵
+python3 neoforge-dev/scripts/validate_compatibility.py compatibility-matrix.json --json
 ```
 
 ### 抓取和索引文档
@@ -164,6 +172,7 @@ python3 neoforge-dev/scripts/build_doc_index.py \
 │   │   ├── forge/1.20.1.md         # 后续目标
 │   │   ├── cleanroom/1.12.2.md    # 后续目标
 │   │   ├── migration/              # 迁移差异与阶段顺序
+│   │   ├── compatibility/          # 联动 Mod 版本矩阵与运行语义
 │   │   └── baseline-gate.md        # 基线解锁条件
 │   └── scripts/                    # 安装后可直接调用的辅助脚本
 ├── scripts/                        # 校验、打包和仓库 wrapper
@@ -181,11 +190,14 @@ python3 -B neoforge-dev/scripts/crawl_docs.py --help
 python3 -B neoforge-dev/scripts/build_doc_index.py --help
 python3 -B neoforge-dev/scripts/validate_loader.py --help
 python3 -B neoforge-dev/scripts/validate_structure.py --help
+python3 -B neoforge-dev/scripts/validate_compatibility.py --help
 python3 scripts/package.py
 unzip -t dist/neoforge-dev.zip
 ```
 
 打包产物：`dist/neoforge-dev.zip` 和 `dist/neoforge-dev.zip.sha256`。ZIP 保留顶层 `neoforge-dev/`，可直接解压到 `$CODEX_HOME/skills`。
+
+`compatibility-matrix.json` 是迁移项目的工作文件，不应把示例中的 `[source-version]`/`[target-version]` 直接当作真实依赖；必须替换为已核对的目标 Mod 构件、版本范围和证据。
 
 ## 官方资料与适配来源
 

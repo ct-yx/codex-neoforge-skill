@@ -43,5 +43,6 @@ BASELINE_GATE:
 - 用户明确指定目标加载器和版本（`Forge 1.20.1` 或 `Cleanroom 1.12.2`）；
 - 迁移分支/提交已与基线实现分离；
 - 先读取对应 `references/<loader>/<version>.md` 和迁移指南。
+- 如果存在联动 Mod，已建立源/目标版本的 `compatibility-matrix.json`，并为每个 Mod 记录目标构件、运行语义、适配层和缺失/错版本降级策略。
 
-门控未解锁时，可以更新资料、建立差异表和运行只读识别脚本，但不能做 Forge/Cleanroom API 替换、重写构建文件或提交移植代码。
+门控未解锁时，可以更新资料、建立差异表、建立联动矩阵草稿和运行只读识别脚本，但不能做 Forge/Cleanroom API 替换、重写构建文件或提交移植代码。

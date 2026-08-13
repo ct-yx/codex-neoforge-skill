@@ -9,6 +9,7 @@
 3. 每条版本事实都应附带官方文档、官方仓库或固定提交；不要用未标版本的博客替代主来源。
 4. 优先修改 `neoforge-dev/SKILL.md` 和对应 `references/` 文件；不要把完整外站原文复制进仓库。
 5. 辅助脚本只使用 Python 标准库，保持可在干净 Python 环境运行。
+6. 迁移或联动 Mod 变更必须更新对应有向路径和 `compatibility-matrix` 证据；不能只修改 API 差异表。
 
 ## 本地检查
 
@@ -19,12 +20,14 @@ python3 -B neoforge-dev/scripts/crawl_docs.py --help >/dev/null
 python3 -B neoforge-dev/scripts/build_doc_index.py --help >/dev/null
 python3 -B neoforge-dev/scripts/validate_loader.py --help >/dev/null
 python3 -B neoforge-dev/scripts/validate_structure.py --help >/dev/null
+python3 -B neoforge-dev/scripts/validate_compatibility.py --help >/dev/null
 python3 scripts/package.py
 unzip -t dist/neoforge-dev.zip
 git diff --check
 ```
 
 如果修改了脚本，请至少用临时 fixture 验证 NeoForge、Forge、Cleanroom 三种项目识别和结构检查；不要修改真实模组项目作为测试副作用。
+如果修改了兼容矩阵逻辑，请至少验证目标 Mod 存在、缺失、错误版本和 `verified` 证据不足四种情况。
 
 ## 提交和发布
 
