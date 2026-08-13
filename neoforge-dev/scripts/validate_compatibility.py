@@ -38,13 +38,23 @@ EVIDENCE_TYPES = {
     "official_docs", "source", "javadoc", "artifact", "static", "build", "launch",
     "client", "server", "game_test", "save", "network", "manual",
 }
+RUNTIME_EVIDENCE_TYPES = {"client", "server", "launch", "game_test"}
+VERIFICATION_PROFILES: dict[str, set[str] | None] = {
+    "build_client_server": {"build", "client", "server"},
+    "build_launch_gametest": {"build", "launch", "game_test"},
+    "build_client_only": {"build", "client"},
+    "build_server_only": {"build", "server"},
+    "build_launch_only": {"build", "launch"},
+    "custom": None,
+}
+REQUIRED_VERIFICATION_FIELDS = {"profile", "required", "not_applicable", "reason"}
 REQUIRED_ENTRY_FIELDS = {
     "source", "target", "mod_id", "source_version_range", "target_version_range",
     "resolved_source_version", "resolved_target_version", "source_artifact", "target_artifact",
     "source_sha256", "target_sha256", "license", "artifact_repository", "maven_version_range",
     "dependency_scope", "sides", "loader_metadata", "integration_surfaces", "runtime_checks",
     "adapter", "dependency_graph", "save_schema", "network_schema", "fallback_behavior",
-    "evidence", "status",
+    "verification_requirements", "evidence", "status",
 }
 
 
@@ -141,6 +151,52 @@ def validate_evidence(value: Any, prefix: str) -> list[str]:
     return errors
 
 
+def validate_verification_requirements(value: Any, prefix: str) -> list[str]:
+    """Validate the explicit evidence profile for one matrix row.
+
+    A row must declare whether client/server/launch/GameTest evidence applies;
+    a generic ``any one of`` rule is intentionally not accepted.  Known
+    profiles provide reproducible combinations, while ``custom`` still needs
+    build plus at least one runtime type.
+    """
+
+    if not isinstance(value, dict):
+        return [f"{prefix} 必须是对象"]
+    errors: list[str] = []
+    missing = REQUIRED_VERIFICATION_FIELDS - value.keys()
+    errors.extend(f"{prefix} 缺少字段：{field}" for field in sorted(missing))
+    profile = text(value.get("profile"))
+    if profile not in VERIFICATION_PROFILES:
+        errors.append(f"{prefix}.profile 必须是 {sorted(VERIFICATION_PROFILES)} 之一")
+
+    def parse_types(field: str, allow_empty: bool = False) -> set[str]:
+        raw = value.get(field)
+        if not isinstance(raw, list) or (not allow_empty and not raw) or len(set(raw)) != len(raw) or not all(text(item) in EVIDENCE_TYPES for item in raw):
+            errors.append(f"{prefix}.{field} 必须是不重复的 evidence type 列表" if allow_empty else f"{prefix}.{field} 必须是非空且不重复的 evidence type 列表")
+            return set()
+        return {text(item) for item in raw}
+
+    required = parse_types("required")
+    not_applicable_set = parse_types("not_applicable", allow_empty=True)
+    overlap = required & not_applicable_set
+    if overlap:
+        errors.append(f"{prefix}.required 与 not_applicable 不能重复：{sorted(overlap)}")
+    if not text(value.get("reason")):
+        errors.append(f"{prefix}.reason 不能为空")
+
+    expected = VERIFICATION_PROFILES.get(profile)
+    if expected is not None and required != expected:
+        errors.append(f"{prefix}.required 必须与 profile={profile} 一致：{sorted(expected)}")
+    if "build" not in required:
+        errors.append(f"{prefix}.required 必须包含 build")
+    if not (required & RUNTIME_EVIDENCE_TYPES):
+        errors.append(f"{prefix}.required 至少包含一种客户端/服务端/启动/GameTest 证据")
+    partition = RUNTIME_EVIDENCE_TYPES - (required | not_applicable_set)
+    if partition:
+        errors.append(f"{prefix} 必须明确声明适用或不适用的运行证据：{sorted(partition)}")
+    return errors
+
+
 def validate_entry(entry: Any, index: int, expected_source: dict[str, str] | None, expected_target: dict[str, str] | None) -> list[str]:
     prefix = f"entries[{index}]"
     if not isinstance(entry, dict):
@@ -229,13 +285,20 @@ def validate_entry(entry: Any, index: int, expected_source: dict[str, str] | Non
 
     evidence_errors = validate_evidence(entry.get("evidence"), f"{prefix}.evidence")
     errors.extend(evidence_errors)
+    errors.extend(validate_verification_requirements(entry.get("verification_requirements"), f"{prefix}.verification_requirements"))
     status = text(entry.get("status"))
     if status not in STATUSES:
         errors.append(f"{prefix}.status 必须是 {sorted(STATUSES)} 之一")
     if status == "verified":
         evidence_types = {item.get("type") for item in entry.get("evidence", []) if isinstance(item, dict) and item.get("status") == "observed"}
-        if "build" not in evidence_types or not ({"client", "server", "launch", "game_test"} & evidence_types):
-            errors.append(f"{prefix}: verified 必须有 observed build 以及 observed client/server/launch/game_test 证据")
+        requirements = entry.get("verification_requirements") if isinstance(entry.get("verification_requirements"), dict) else {}
+        required = {text(item) for item in requirements.get("required", []) if text(item)}
+        missing = sorted(required - evidence_types)
+        if missing:
+            errors.append(f"{prefix}: verified 缺少 declared required observed evidence：{', '.join(missing)}")
+        contradictory = sorted(evidence_types & {text(item) for item in requirements.get("not_applicable", []) if text(item)})
+        if contradictory:
+            errors.append(f"{prefix}: verified 出现标记为 not_applicable 的 observed evidence：{', '.join(contradictory)}")
     if status == "blocked":
         joined = " ".join(text(item) for item in runtime) if isinstance(runtime, list) else ""
         if "blocked" not in joined.casefold() and "缺失" not in joined and "阻塞" not in joined:

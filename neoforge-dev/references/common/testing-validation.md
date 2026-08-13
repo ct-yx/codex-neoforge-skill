@@ -28,7 +28,7 @@
 4. 只装客户端或只装服务端：不加载错误侧类，不破坏 dedicated server。
 5. 需要时回归网络 payload、配方/tag、世界生成、旧存档和注册 ID。
 
-矩阵状态只有在组合运行证据存在时才能从 `implemented` 更新为 `verified`。
+矩阵行必须先声明 `verification_requirements` 的 required/not_applicable 组合；只有 required 集合中的全部 observed 构建与适用运行证据存在时，才能从 `implemented` 更新为 `verified`。不能用任意一个运行证据替代客户端、服务端或专用测试的明确要求。
 
 ## 回归矩阵
 

@@ -46,6 +46,12 @@
         "wrong_version": "不加载目标 API 并记录实际版本",
         "side_mismatch": "只在允许侧加载 adapter，dedicated server 不解析客户端类"
       },
+      "verification_requirements": {
+        "profile": "build_client_server",
+        "required": ["build", "client", "server"],
+        "not_applicable": ["launch", "game_test"],
+        "reason": "联动同时影响客户端展示和服务端权威状态；不使用独立 launch/GameTest 作为本行完成条件"
+      },
       "evidence": [
         {"type": "official_docs", "source": "目标版本 Mod API/Javadoc URL + commit", "status": "planned", "commit": null, "notes": ""},
         {"type": "build", "source": "目标分支构建日志路径", "status": "planned", "commit": null, "notes": ""},

@@ -32,7 +32,7 @@ def render(document: dict, result: dict) -> str:
         lines.extend(f"- ⚠️ {warning}" for warning in result["warnings"])
     if not result.get("errors") and not result.get("warnings"):
         lines.append("- ✅ 无诊断信息")
-    lines.extend(["", "## 矩阵行", "", "| Mod | 源 → 目标 | 构件版本 | 状态 | 证据类型 |", "| --- | --- | --- | --- | --- |"])
+    lines.extend(["", "## 矩阵行", "", "| Mod | 源 → 目标 | 构件版本 | 状态 | 验证 profile | 要求/不适用 | observed 证据 |", "| --- | --- | --- | --- | --- | --- | --- |"])
     for entry in document.get("entries", []):
         if not isinstance(entry, dict):
             continue
@@ -41,9 +41,13 @@ def render(document: dict, result: dict) -> str:
         source_label = f"{text(source.get('loader'))}:{text(source.get('minecraft'))}"
         target_label = f"{text(target.get('loader'))}:{text(target.get('minecraft'))}"
         versions = f"{text(entry.get('resolved_source_version')) or 'TODO'} → {text(entry.get('resolved_target_version')) or 'TODO'}"
-        evidence = ", ".join(sorted({text(item.get("type")) for item in entry.get("evidence", []) if isinstance(item, dict)})) or "none"
-        lines.append(f"| `{text(entry.get('mod_id'))}` | `{source_label}` → `{target_label}` | `{versions}` | `{text(entry.get('status'))}` | `{evidence}` |")
-    lines.extend(["", "## 验收规则", "", "`verified` 必须同时具备 observed 构建证据和 observed 客户端/服务端/启动/GameTest 组合证据。构件版本与 SHA-256 应来自 artifact lock。", ""])
+        requirements = entry.get("verification_requirements", {}) if isinstance(entry.get("verification_requirements"), dict) else {}
+        profile = text(requirements.get("profile")) or "未声明"
+        required = ", ".join(text(item) for item in requirements.get("required", []) if text(item)) or "未声明"
+        not_applicable = ", ".join(text(item) for item in requirements.get("not_applicable", []) if text(item)) or "无"
+        observed = ", ".join(sorted({text(item.get("type")) for item in entry.get("evidence", []) if isinstance(item, dict) and text(item.get("status")) == "observed"})) or "none"
+        lines.append(f"| `{text(entry.get('mod_id'))}` | `{source_label}` → `{target_label}` | `{versions}` | `{text(entry.get('status'))}` | `{profile}` | require: `{required}`; N/A: `{not_applicable}` | `{observed}` |")
+    lines.extend(["", "## 验收规则", "", "每行必须声明 `verification_requirements`：`required` 包含 build 和适用的运行证据，`not_applicable` 明确列出不适用类型。`verified` 必须满足该行声明的全部 required observed 证据；构件版本与 SHA-256 应来自 artifact lock。", ""])
     return "\n".join(lines)
 
 

@@ -92,7 +92,7 @@ def main() -> None:
     insufficient["entries"][0]["source_sha256"] = "0" * 64
     insufficient["entries"][0]["target_sha256"] = "1" * 64
     insufficient["entries"][0]["evidence"] = [{"type": "build", "source": "build.log", "status": "observed"}]
-    expect_failure(insufficient, "verified-evidence", "verified 必须有 observed build")
+    expect_failure(insufficient, "verified-evidence", "verified 缺少 declared required observed evidence")
 
     asymmetry = load()
     asymmetry["entries"][0]["loader_metadata"]["side"] = "CLIENT"

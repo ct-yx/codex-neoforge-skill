@@ -16,6 +16,11 @@ source_sha256: TODO
 target_sha256: TODO
 license: TODO
 artifact_repository: TODO
+verification_requirements:
+  profile: build_client_server
+  required: [build, client, server]
+  not_applicable: [launch, game_test]
+  reason: TODO
 ```
 
 ## 运行语义审查
@@ -54,7 +59,7 @@ artifact_repository: TODO
 
 ## 验证记录
 
-至少分别记录 `static`、`build`、`launch`、`client`、`server`、`save`、`network` 或 `game_test` 证据。组合矩阵：
+按 `verification_requirements` 记录 required 类型的 observed 证据，并把不适用的运行类型显式列在 `not_applicable`；除此之外可补充 `static`、`save`、`network` 证据。组合矩阵：
 
 ```text
 BASELINE_ONLY / TARGET_MOD_PRESENT / TARGET_MOD_WRONG_VERSION

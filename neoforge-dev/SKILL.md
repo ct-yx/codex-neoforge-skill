@@ -84,7 +84,7 @@ Java 命名、侧/线程、包结构和资源不变量见：
 
 迁移时必须同时迁移“本 Mod API”和“联动 Mod 在目标版本的运行逻辑”。不要因为 `mod_id` 相同或找到了同名方法，就假设其他 Mod 的注册、事件时序、Capability/Attachment、payload、数据格式、客户端入口和存档行为相同。
 
-先读取 [references/compatibility/mod-compatibility.md](references/compatibility/mod-compatibility.md)、[references/compatibility/schema.json](references/compatibility/schema.json)、[references/compatibility/integration-template.md](references/compatibility/integration-template.md)、[references/compatibility/artifact-lock.example.json](references/compatibility/artifact-lock.example.json) 和 [references/compatibility/compatibility-matrix.example.json](references/compatibility/compatibility-matrix.example.json)，在迁移分支维护 `compatibility-matrix.json`。矩阵使用 `schema_version: 2`，构件解析版本和 SHA-256 另由 `artifact-lock.json` 锁定。每个联动 Mod 必须按有向路径记录：
+先读取 [references/compatibility/mod-compatibility.md](references/compatibility/mod-compatibility.md)、[references/compatibility/schema.json](references/compatibility/schema.json)、[references/compatibility/integration-template.md](references/compatibility/integration-template.md)、[references/compatibility/artifact-lock.example.json](references/compatibility/artifact-lock.example.json) 和 [references/compatibility/compatibility-matrix.example.json](references/compatibility/compatibility-matrix.example.json)，在迁移分支维护 `compatibility-matrix.json`。矩阵使用 `schema_version: 2`，构件解析版本和 SHA-256 另由 `artifact-lock.json` 锁定。每个联动 Mod 必须按有向路径记录，并在 `verification_requirements` 中显式声明 `profile`、required evidence、`not_applicable` 和理由：
 
 ```text
 SOURCE loader/Minecraft/Java
@@ -115,7 +115,7 @@ SOURCE loader/Minecraft/Java
 - 用 `compile`、`runtime`、`compile_runtime`、`optional` 明确依赖范围；客户端联动不得被 dedicated server 加载。
 - 对每个联动 Mod 验证：无 Mod、目标版本、错误版本、client/server 不对称、数据/存档、网络（如使用）。
 - 读取对应的 [loader metadata 说明](references/compatibility/loader-metadata/)，不要把 NeoForge/Forge TOML 字段直接套到 Cleanroom 的 `mcmod.info`/模板依赖。
-- 状态按 `planned -> implemented -> built -> launched -> verified` 推进；目标构件未锁定、没有 observed 构建证据或没有 observed 客户端/服务端/启动/GameTest 组合证据时，不得标为 `verified`。目标缺失或版本不可用时使用 `blocked` 并写明降级。
+- 状态按 `planned -> implemented -> built -> launched -> verified` 推进；目标构件未锁定或没有满足本行 `verification_requirements.required` 的全部 observed 证据时，不得标为 `verified`。required 必须包含 `build` 和至少一种明确适用的客户端/服务端/启动/GameTest 证据；不适用类型必须列入 `not_applicable` 并说明理由。目标缺失或版本不可用时使用 `blocked` 并写明降级。
 
 运行矩阵检查：
 
@@ -183,10 +183,10 @@ python3 neoforge-dev/scripts/validate_matrix_fixtures.py
 脚本只读或写指定输出目录，不修改模组源码：
 
 ```bash
-# 抓取同域名 HTML，处理 429/5xx 退避，输出 manifest.json 与 pages/
+# 抓取同主机 HTML，限制 HTTP(S) 重定向和单响应大小，处理 429/5xx 退避，输出 manifest.json 与 pages/
 python3 neoforge-dev/scripts/crawl_docs.py \
   --url https://docs.neoforged.net/docs/1.21.1/ \
-  --output /tmp/neoforge-docs --max-pages 200
+  --output /tmp/neoforge-docs --max-pages 200 --max-bytes 10485760
 
 # 从 Markdown/MDX/HTML 建立标题、关键词、哈希索引
 python3 neoforge-dev/scripts/build_doc_index.py \

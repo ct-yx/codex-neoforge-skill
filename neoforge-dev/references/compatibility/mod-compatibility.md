@@ -94,4 +94,4 @@ DATA_AND_SAVE                         # 配方/标签/存档/世界数据回归
 NETWORK_IF_USED                       # payload/message、方向、线程和校验
 ```
 
-证据必须标注是静态检查、构建、CI、客户端、专用服务器还是实际组合游戏测试；`verified` 必须同时拥有 observed 的构建证据和 observed 的客户端/服务端/启动/GameTest 证据。只有静态检查时状态为 `implemented`，只有构建时为 `built`，只有启动时为 `launched`。
+证据必须标注是静态检查、构建、CI、客户端、专用服务器还是实际组合游戏测试。每个矩阵行都必须填写 `verification_requirements`，显式列出 required evidence、`not_applicable` 类型和理由；已知 profile 包括 `build_client_server`、`build_launch_gametest`、`build_client_only`、`build_server_only`、`build_launch_only` 和 `custom`。`verified` 必须满足该行 required 集合中的全部 observed 证据，不能再用“任意一种运行证据”推断。只有静态检查时状态为 `implemented`，只有构建时为 `built`，只有启动时为 `launched`。

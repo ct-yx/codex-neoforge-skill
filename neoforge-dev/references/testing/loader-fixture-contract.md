@@ -10,7 +10,7 @@
 
 ## 结构检查边界
 
-- `validate_loader.py` 必须输出唯一 loader、Minecraft 和 Java 证据。
+- `validate_loader.py` 必须按 Gradle 子项目输出 loader、Minecraft、Java、模块路径、证据文件和扫描文件；根项目检测到多个活动 loader 或版本时必须返回 `ambiguous`，要求使用显式目标。
 - `validate_structure.py` 必须检查 wrapper、Gradle、Java、资源和对应 metadata。
 - 缺少可选 `src/generated/resources` 或 `src/main/resource-templates` 时只产生 warning。
 - 同时出现多套活动 metadata 时必须产生 warning，不静默选择。

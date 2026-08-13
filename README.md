@@ -71,11 +71,60 @@ curl -fL https://github.com/ct-yx/codex-neoforge-skill/releases/latest/download/
   -o "$tmp/neoforge-dev.zip"
 curl -fL https://github.com/ct-yx/codex-neoforge-skill/releases/latest/download/neoforge-dev.zip.sha256 \
   -o "$tmp/neoforge-dev.zip.sha256"
-(cd "$tmp" && shasum -a 256 -c neoforge-dev.zip.sha256)
-unzip -q -o "$tmp/neoforge-dev.zip" -d "$CODEX_HOME/skills"
+python3 - "$tmp/neoforge-dev.zip" "$tmp/neoforge-dev.zip.sha256" "$CODEX_HOME/skills" <<'PY'
+import hashlib
+import datetime
+import shutil
+import sys
+import tempfile
+import zipfile
+from pathlib import Path
+
+archive, checksum_file, skills_dir = map(Path, sys.argv[1:])
+expected = checksum_file.read_text(encoding="utf-8").split()[0].lower()
+actual = hashlib.sha256(archive.read_bytes()).hexdigest()
+if expected != actual:
+    raise SystemExit(f"SHA-256 mismatch: expected {expected}, got {actual}")
+
+skills_dir.mkdir(parents=True, exist_ok=True)
+staging = Path(tempfile.mkdtemp(prefix=".neoforge-dev.staging-", dir=skills_dir))
+backup = None
+try:
+    with zipfile.ZipFile(archive) as bundle:
+        for member in bundle.infolist():
+            member_path = Path(member.filename.replace("\\", "/"))
+            if member_path.is_absolute() or ".." in member_path.parts:
+                raise SystemExit(f"unsafe archive member: {member.filename}")
+        if bundle.testzip() is not None:
+            raise SystemExit("archive CRC check failed")
+        bundle.extractall(staging)
+    extracted = staging / "neoforge-dev"
+    if not (extracted / "SKILL.md").is_file():
+        raise SystemExit("archive does not contain neoforge-dev/SKILL.md")
+
+    target = skills_dir / "neoforge-dev"
+    if target.exists() or target.is_symlink():
+        suffix = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+        backup = skills_dir / f"neoforge-dev.backup-{suffix}"
+        counter = 1
+        while backup.exists() or backup.is_symlink():
+            backup = skills_dir / f"neoforge-dev.backup-{suffix}-{counter}"
+            counter += 1
+        target.rename(backup)
+    extracted.rename(target)
+    print(f"Installed {target}")
+    if backup:
+        print(f"Previous installation moved to {backup}")
+except Exception:
+    if backup and backup.exists() and not (skills_dir / "neoforge-dev").exists():
+        backup.rename(skills_dir / "neoforge-dev")
+    raise
+finally:
+    shutil.rmtree(staging, ignore_errors=True)
+PY
 ```
 
-如果已有旧版本，推荐使用下面的源码安装方式；`install.sh --force` 会先把旧目录移动为带时间戳的备份。
+Release 安装会先用 Python 校验 SHA-256，再解压到 staging 目录；只有 staging 完整后才替换现有安装，旧目录会移动为带时间戳的备份，不会混合残留旧文件。整个流程只依赖 Python 3，不要求 macOS 专用的 `shasum` 或 Linux 专用的 `sha256sum`。
 
 ### 方式二：从源码安装（推荐开发者）
 
@@ -163,14 +212,14 @@ python3 neoforge-dev/scripts/validate_matrix_fixtures.py
 ```bash
 python3 neoforge-dev/scripts/crawl_docs.py \
   --url https://docs.neoforged.net/docs/1.21.1/ \
-  --output /tmp/neoforge-docs --max-pages 200
+  --output /tmp/neoforge-docs --max-pages 200 --max-bytes 10485760
 
 python3 neoforge-dev/scripts/build_doc_index.py \
   --input /tmp/neoforge-docs/pages \
   --output /tmp/neoforge-doc-index.json
 ```
 
-爬虫只跟随起始站点同域名 HTML 链接，记录 URL、标题、哈希、链接数量和抓取错误；对 429/5xx 做有限退避，不修改模组项目。
+爬虫只接受 `http`/`https` 起始 URL，只跟随起始站点同主机 HTML 链接；会拒绝跨主机/非 HTTP(S) 重定向，并按 `--max-bytes`（默认 10 MiB）分块限制单响应大小。manifest 记录请求 URL、最终 URL、Content-Type、Content-Length、标题、哈希、链接数量和抓取错误；对 429/5xx 做有限退避，不修改模组项目。
 
 ## 仓库结构
 
@@ -213,7 +262,7 @@ unzip -t dist/neoforge-dev.zip
 
 打包产物：`dist/neoforge-dev.zip` 和 `dist/neoforge-dev.zip.sha256`。ZIP 保留顶层 `neoforge-dev/`，可直接解压到 `$CODEX_HOME/skills`。
 
-`compatibility-matrix.json` 使用 Schema v2；`artifact-lock.json` 记录解析版本、来源、许可证和 SHA-256。示例中的 `[source-version]`/`[target-version]`、`example.invalid` 和 `planned` 只能作为模板，必须替换为已核对的目标 Mod 构件、版本范围和证据。只有 observed 构建证据与组合运行证据同时存在时，才能标为 `verified`。
+`compatibility-matrix.json` 使用 Schema v2；`artifact-lock.json` 记录解析版本、来源、许可证和 SHA-256。示例中的 `[source-version]`/`[target-version]`、`example.invalid` 和 `planned` 只能作为模板，必须替换为已核对的目标 Mod 构件、版本范围和证据。每行还必须填写 `verification_requirements`，明确 required 与 `not_applicable`；只有该行 required 集合中的全部 observed 证据存在时，才能标为 `verified`。
 
 ## 官方资料与适配来源
 

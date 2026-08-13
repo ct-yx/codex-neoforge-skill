@@ -96,7 +96,7 @@
         "resolved_source_version", "resolved_target_version", "source_artifact", "target_artifact",
         "source_sha256", "target_sha256", "license", "artifact_repository", "maven_version_range",
         "dependency_scope", "sides", "loader_metadata", "integration_surfaces", "runtime_checks",
-        "adapter", "dependency_graph", "save_schema", "network_schema", "fallback_behavior", "evidence", "status"
+        "adapter", "dependency_graph", "save_schema", "network_schema", "fallback_behavior", "verification_requirements", "evidence", "status"
       ],
       "properties": {
         "source": {"$ref": "#/$defs/endpoint"},
@@ -125,10 +125,25 @@
         "save_schema": {"$ref": "#/$defs/schema_note"},
         "network_schema": {"$ref": "#/$defs/schema_note"},
         "fallback_behavior": {"$ref": "#/$defs/fallback"},
+        "verification_requirements": {"$ref": "#/$defs/verification_requirements"},
         "evidence": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/evidence"}},
         "status": {"enum": ["planned", "implemented", "built", "launched", "verified", "blocked"]}
       },
       "additionalProperties": false
+    },
+    "verification_requirements": {
+      "type": "object",
+      "required": ["profile", "required", "not_applicable", "reason"],
+      "properties": {
+        "profile": {"enum": ["build_client_server", "build_launch_gametest", "build_client_only", "build_server_only", "build_launch_only", "custom"]},
+        "required": {"type": "array", "minItems": 2, "uniqueItems": true, "items": {"$ref": "#/$defs/evidence_type"}},
+        "not_applicable": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/evidence_type"}},
+        "reason": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "evidence_type": {
+      "enum": ["official_docs", "source", "javadoc", "artifact", "static", "build", "launch", "client", "server", "game_test", "save", "network", "manual"]
     }
   },
   "additionalProperties": false

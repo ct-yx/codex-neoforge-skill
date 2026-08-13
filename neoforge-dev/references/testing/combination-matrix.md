@@ -16,6 +16,21 @@ blocked（记录阻塞原因和无联动降级）
 - `save`：创建、关闭、重载旧/新存档并检查注册 ID/NBT/Attachment/SavedData。
 - `network`：客户端连接、payload/message codec、方向、线程和服务端权限校验。
 
+## 每行的验证声明
+
+兼容矩阵每一行都必须有：
+
+```json
+"verification_requirements": {
+  "profile": "build_client_server",
+  "required": ["build", "client", "server"],
+  "not_applicable": ["launch", "game_test"],
+  "reason": "说明为什么选择该组合以及哪些验证类型不适用"
+}
+```
+
+`required` 必须包含 `build` 和至少一种运行证据；`not_applicable` 必须明确列出其余 `client`、`server`、`launch`、`game_test` 类型。`verified` 只在该行声明的所有 required evidence 都是 observed 时成立。
+
 ## 最小组合矩阵
 
 | Case ID | 联动 Mod | 目标构件 | 侧 | 预期 | 命令/日志 | 状态 |
@@ -32,4 +47,4 @@ blocked（记录阻塞原因和无联动降级）
 
 ## 完成门槛
 
-仅当本 Mod `build` 成功、目标实例启动、目标 Mod 组合运行和需要的存档/网络回归均有证据时，才将对应兼容矩阵行升级为 `verified`。缺少客户端或专用服务器环境时，保留 `planned`/`blocked`，不要把静态检查当作运行通过。
+仅当本 Mod `build` 成功、声明适用的目标实例/客户端/专用服务器/GameTest 组合运行以及需要的存档/网络回归均有证据时，才将对应兼容矩阵行升级为 `verified`。缺少声明为 required 的客户端或专用服务器环境时，保留 `planned`/`blocked`，不要把静态检查当作运行通过。
