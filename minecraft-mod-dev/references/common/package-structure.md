@@ -50,7 +50,7 @@ Forge 的 `mods.toml`、Java 17、SimpleChannel 和旧版事件签名不能出�
 ```text
 src/main/java/<root>/
 ├── <Mod>.java
-├── registry/       # 1.12.2 Forge 注册事件/对象
+├── registry/       # Cleanroom 1.12.2（旧 Forge API 体系）注册事件/对象
 ├── event/          # FML 生命周期与 MinecraftForge.EVENT_BUS
 ├── network/        # 1.12.2 网络实现
 └── client/         # 物理客户端隔离

@@ -58,6 +58,16 @@ jobs:
           python3 minecraft-mod-dev/scripts/validate_structure.py "$fixture_root/neo" --loader neoforge
           python3 minecraft-mod-dev/scripts/validate_structure.py "$fixture_root/forge" --loader forge
           python3 minecraft-mod-dev/scripts/validate_structure.py "$fixture_root/clean" --loader cleanroom
+          mkdir -p "$fixture_root/forge1122/src/main/java/com/example/mod" "$fixture_root/forge1122/src/main/resources/META-INF"
+          : > "$fixture_root/forge1122/gradlew"
+          : > "$fixture_root/forge1122/settings.gradle"
+          printf "plugins { id 'net.minecraftforge.gradle' version '6.0.25' }\njava { toolchain { languageVersion = JavaLanguageVersion.of(8) } }\n" > "$fixture_root/forge1122/build.gradle"
+          printf 'minecraft_version=1.12.2\n' > "$fixture_root/forge1122/gradle.properties"
+          : > "$fixture_root/forge1122/src/main/resources/META-INF/mods.toml"
+          if python3 minecraft-mod-dev/scripts/validate_loader.py "$fixture_root/forge1122" --expect-loader forge --expect-minecraft 1.12.2; then
+            echo 'Forge 1.12.2 must remain outside the supported matrix' >&2
+            exit 1
+          fi
       - name: Generate compatibility report
         run: python3 minecraft-mod-dev/scripts/generate_compatibility_report.py minecraft-mod-dev/references/compatibility/compatibility-matrix.example.json --output /tmp/compatibility-report.md
       - name: Build release archive

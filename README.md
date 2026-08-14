@@ -165,9 +165,11 @@ Release ZIP 保留顶层 `minecraft-mod-dev/`，可直接用于 `$CODEX_HOME/ski
 | --- | --- | --- | --- | --- |
 | 当前开发基线 | NeoForge 1.21.1 | 21 | `neoforge.mods.toml`、ModDevGradle/NeoGradle | 默认执行 |
 | 后续迁移目标 | Forge 1.20.1 | 17 | `mods.toml`、ForgeGradle/MDK、`SimpleChannel` | 基线验收后 |
-| 后续迁移目标 | Cleanroom 1.12.2 | 以模板和 CI 为准；审计模板使用 Java 25 toolchain | Blossom、`mcmod.info`、旧版 FML 生命周期 | 基线验收后 |
+| 后续迁移目标 | Cleanroom 1.12.2（仅 Cleanroom） | 以模板和 CI 为准；审计模板使用 Java 25 toolchain | Blossom、`mcmod.info`、旧版 FML 生命周期 | 基线验收后 |
 
 版本表是工作边界，不是对任意项目模板的强制配置。每次任务仍需读取项目实际的 Gradle toolchain、loader 元数据、mapping、运行目录和任务列表。
+
+> **1.12.2 支持边界：** 1.12.2 仅支持 Cleanroom，不支持 Forge 1.12.2。Forge 支持线保持为 1.20.1；NeoForge 基线保持为 1.21.1。Cleanroom 使用部分旧 Forge API 体系是实现背景，不改变目标 loader 的判断。
 
 ## 基线门控
 

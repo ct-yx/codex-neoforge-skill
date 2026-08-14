@@ -1,6 +1,6 @@
 # 基线门控
 
-本 skill 的默认基线是 **NeoForge 1.21.1**。Forge 1.20.1 和 Cleanroom 1.12.2 只作为后续迁移目标，不得在基线尚未验收时混入实现代码。
+本 skill 的默认基线是 **NeoForge 1.21.1**。Forge 1.20.1 和 Cleanroom 1.12.2 只作为后续迁移目标；Minecraft 1.12.2 仅支持 Cleanroom，不支持 Forge 1.12.2，不得在基线尚未验收时混入实现代码。
 
 ```text
 BASELINE_GATE:
@@ -18,6 +18,8 @@ BASELINE_GATE:
 - `java`: 实际 toolchain、`java -version` 和 CI 版本
 - `baseline_status`: `in_progress`、`accepted` 或 `unknown`
 - `baseline_evidence`: 命令、日志、提交或 CI 链接
+
+版本与 loader 必须匹配：`neoforge:1.21.1`、`forge:1.20.1` 或 `cleanroom:1.12.2`。`forge:1.12.2` 属于支持范围外目标。
 
 没有证据时使用 `unknown`，并继续做识别和静态检查；不要把 `unknown` 当作 `accepted`。
 

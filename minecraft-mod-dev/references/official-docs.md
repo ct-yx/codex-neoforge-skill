@@ -55,6 +55,8 @@
 
 ### Cleanroom 1.12.2
 
+本资料线只用于 Cleanroom 1.12.2。它审阅了旧 Forge API 资料以理解 Cleanroom 的兼容层，不代表本 skill 支持独立 Forge 1.12.2；Forge 目标版本保持为 1.20.1。
+
 - 官方 Wiki 源码：[CleanroomMC/Website](https://github.com/CleanroomMC/Website)，提交 `89314645e4e8b713688ba49ea6f84cbffd30cac7`
 - 模板：[CleanroomMC/CleanroomModTemplate](https://github.com/CleanroomMC/CleanroomModTemplate)，提交 `935558879c66eede20591e0b21793cabcff3363b`
 - 开发环境：[CleanroomMC/ForgeDevEnv](https://github.com/CleanroomMC/ForgeDevEnv)，提交 `807478aff106f33219b439296ed2792b171ccf69`

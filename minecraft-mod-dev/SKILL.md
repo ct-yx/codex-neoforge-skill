@@ -20,6 +20,15 @@ BASELINE_GATE:
 
 详细门控和验收证据见 [references/baseline-gate.md](references/baseline-gate.md)。收到 Forge/Cleanroom 请求时，先检查 `baseline_status` 和证据；状态为 `in_progress`/`unknown` 时只做资料登记、只读识别和差异表，不替换 API、构建文件或资源。
 
+## 0.1 版本支持边界
+
+```text
+1.12.2 仅支持 Cleanroom，不支持 Forge 1.12.2。
+Forge 支持线保持为 1.20.1；NeoForge 基线保持为 1.21.1。
+```
+
+Cleanroom 1.12.2 使用部分旧 Forge API 体系是实现背景，不代表本 skill 支持独立的 Forge 1.12.2 loader。收到 Forge 1.12.2 请求时，只登记为超出支持矩阵的目标，不创建 Forge 1.12.2 构建、迁移或联动验证代码。
+
 ## 1. 读取项目事实
 
 按以下顺序执行，不凭目录名或记忆猜版本：

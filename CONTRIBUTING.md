@@ -6,10 +6,11 @@
 
 1. 默认基线始终是 NeoForge 1.21.1 / Java 21。
 2. Forge 1.20.1 和 Cleanroom 1.12.2 内容只能作为后续迁移参考；不要把它们的 API 示例混入 NeoForge 基线章节。
-3. 每条版本事实都应附带官方文档、官方仓库或固定提交；不要用未标版本的博客替代主来源。
-4. 优先修改 `minecraft-mod-dev/SKILL.md` 和对应 `references/` 文件；不要把完整外站原文复制进仓库。
-5. 辅助脚本只使用 Python 标准库，保持可在干净 Python 环境运行。
-6. 迁移或联动 Mod 变更必须更新对应有向路径和 `compatibility-matrix` 证据；不能只修改 API 差异表。
+3. Minecraft 1.12.2 仅支持 Cleanroom；Forge 1.12.2 不在支持矩阵中，Forge 目标版本保持为 1.20.1。
+4. 每条版本事实都应附带官方文档、官方仓库或固定提交；不要用未标版本的博客替代主来源。
+5. 优先修改 `minecraft-mod-dev/SKILL.md` 和对应 `references/` 文件；不要把完整外站原文复制进仓库。
+6. 辅助脚本只使用 Python 标准库，保持可在干净 Python 环境运行。
+7. 迁移或联动 Mod 变更必须更新对应有向路径和 `compatibility-matrix` 证据；不能只修改 API 差异表。
 
 ## 本地检查
 

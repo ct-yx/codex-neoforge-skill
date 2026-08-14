@@ -19,6 +19,10 @@ LOADER_ALIASES = {
     "clean room": "cleanroom",
 }
 
+UNSUPPORTED_LOADER_VERSIONS = {
+    ("forge", "1.12.2"): "Minecraft 1.12.2 仅支持 Cleanroom；Forge 1.12.2 不在本 skill 支持范围",
+}
+
 SCAN_NAMES = {
     "build.gradle",
     "build.gradle.kts",
@@ -275,6 +279,9 @@ def main() -> None:
         problems.append(f"期望 loader={args.expect_loader}，实际为 {result['loader']}")
     if args.expect_minecraft and result["minecraft"] != args.expect_minecraft:
         problems.append(f"期望 Minecraft={args.expect_minecraft}，实际为 {result['minecraft'] or 'unknown'}")
+    unsupported_message = UNSUPPORTED_LOADER_VERSIONS.get((result["loader"], result["minecraft"]))
+    if unsupported_message:
+        problems.append(unsupported_message)
     result["ok"] = not problems
     result["problems"] = problems
     if args.json:
