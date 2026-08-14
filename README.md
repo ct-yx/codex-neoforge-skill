@@ -1,7 +1,7 @@
 # Codex Minecraft Mod Skill
 
-[![Validate](https://github.com/ct-yx/codex-neoforge-skill/actions/workflows/validate.yml/badge.svg)](https://github.com/ct-yx/codex-neoforge-skill/actions/workflows/validate.yml)
-[![Latest release](https://img.shields.io/github/v/release/ct-yx/codex-neoforge-skill)](https://github.com/ct-yx/codex-neoforge-skill/releases/latest)
+[![Validate](https://github.com/ct-yx/codex-minecraft-mod-skill/actions/workflows/validate.yml/badge.svg)](https://github.com/ct-yx/codex-minecraft-mod-skill/actions/workflows/validate.yml)
+[![Latest release](https://img.shields.io/github/v/release/ct-yx/codex-minecraft-mod-skill)](https://github.com/ct-yx/codex-minecraft-mod-skill/releases/latest)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 面向 **Codex** 的 Minecraft 模组开发 skill。默认以 **NeoForge 1.21.1 / Java 21** 为开发基线，提供项目识别、Java/Gradle 规范、注册与事件、资源与数据生成、构建验收，以及基线完成后的 Forge 1.20.1、Cleanroom 1.12.2 迁移和联动 Mod 兼容知识库。
@@ -35,12 +35,12 @@
 macOS/Linux：
 
 ```bash
-git clone https://github.com/ct-yx/codex-neoforge-skill.git
-cd codex-neoforge-skill
+git clone https://github.com/ct-yx/codex-minecraft-mod-skill.git
+cd codex-minecraft-mod-skill
 ./install.sh
 ```
 
-安装脚本默认写入 `${CODEX_HOME:-$HOME/.codex}/skills/neoforge-dev`。目标目录已经存在时，脚本会停止；确认替换并保留带时间戳的备份：
+安装脚本默认写入 `${CODEX_HOME:-$HOME/.codex}/skills/minecraft-mod-dev`。目标目录已经存在时，脚本会停止；确认替换并保留带时间戳的备份：
 
 ```bash
 ./install.sh --force
@@ -49,8 +49,8 @@ cd codex-neoforge-skill
 Windows PowerShell：
 
 ```powershell
-git clone https://github.com/ct-yx/codex-neoforge-skill.git
-Set-Location codex-neoforge-skill
+git clone https://github.com/ct-yx/codex-minecraft-mod-skill.git
+Set-Location codex-minecraft-mod-skill
 .\install.ps1
 ```
 
@@ -60,24 +60,35 @@ Set-Location codex-neoforge-skill
 .\install.ps1 -Force
 ```
 
+从旧版 `neoforge-dev` 迁移时，安装新 skill 后可把旧目录移出扫描路径：
+
+```bash
+old="${CODEX_HOME:-$HOME/.codex}/skills/neoforge-dev"
+if [[ -e "$old" || -L "$old" ]]; then
+  mv "$old" "${old}.backup-renamed-$(date +%Y%m%d-%H%M%S)"
+fi
+```
+
+旧版目录只作为迁移备份保留，新的调用名是 `$minecraft-mod-dev`。
+
 安装完成后，从下一个 Codex 回合开始显式调用：
 
 ```text
-使用 $neoforge-dev 以 NeoForge 1.21.1 为基线检查当前项目，并完成这个模组开发任务。
+使用 $minecraft-mod-dev 以 NeoForge 1.21.1 为基线检查当前项目，并完成这个模组开发任务。
 ```
 
-也可以直接描述目标，或把 `$neoforge-dev` 写在请求中：
+也可以直接描述目标，或把 `$minecraft-mod-dev` 写在请求中：
 
 ```text
-使用 $neoforge-dev 检查 NeoForge 1.21.1 的注册、资源和数据生成是否一致。
-使用 $neoforge-dev 按 BASELINE_GATE 记录当前基线验收状态，不要开始 Forge 移植。
-基线已验收；使用 $neoforge-dev 将模组迁移到 Forge 1.20.1，并逐阶段验证。
-基线已验收；使用 $neoforge-dev 检查迁移分支中联动 Mod 的目标版本运行逻辑。
+使用 $minecraft-mod-dev 检查 NeoForge 1.21.1 的注册、资源和数据生成是否一致。
+使用 $minecraft-mod-dev 按 BASELINE_GATE 记录当前基线验收状态，不要开始 Forge 移植。
+基线已验收；使用 $minecraft-mod-dev 将模组迁移到 Forge 1.20.1，并逐阶段验证。
+基线已验收；使用 $minecraft-mod-dev 检查迁移分支中联动 Mod 的目标版本运行逻辑。
 ```
 
 ### 方式二：从 Release 安装（macOS/Linux）
 
-Release 页面：[最新版本](https://github.com/ct-yx/codex-neoforge-skill/releases/latest)。下载 ZIP 和同名 `.sha256` 后，下面的流程会先校验哈希，再在 staging 目录完整解压，最后原子替换安装目录；旧版本会移动为备份，不会和新旧文件混合：
+Release 页面：[最新版本](https://github.com/ct-yx/codex-minecraft-mod-skill/releases/latest)。下载 ZIP 和同名 `.sha256` 后，下面的流程会先校验哈希，再在 staging 目录完整解压，最后原子替换安装目录；旧版本会移动为备份，不会和新旧文件混合：
 
 ```bash
 set -euo pipefail
@@ -86,12 +97,12 @@ tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 mkdir -p "$CODEX_HOME/skills"
 
-curl -fL https://github.com/ct-yx/codex-neoforge-skill/releases/latest/download/neoforge-dev.zip \
-  -o "$tmp/neoforge-dev.zip"
-curl -fL https://github.com/ct-yx/codex-neoforge-skill/releases/latest/download/neoforge-dev.zip.sha256 \
-  -o "$tmp/neoforge-dev.zip.sha256"
+curl -fL https://github.com/ct-yx/codex-minecraft-mod-skill/releases/latest/download/minecraft-mod-dev.zip \
+  -o "$tmp/minecraft-mod-dev.zip"
+curl -fL https://github.com/ct-yx/codex-minecraft-mod-skill/releases/latest/download/minecraft-mod-dev.zip.sha256 \
+  -o "$tmp/minecraft-mod-dev.zip.sha256"
 
-python3 - "$tmp/neoforge-dev.zip" "$tmp/neoforge-dev.zip.sha256" "$CODEX_HOME/skills" <<'PY'
+python3 - "$tmp/minecraft-mod-dev.zip" "$tmp/minecraft-mod-dev.zip.sha256" "$CODEX_HOME/skills" <<'PY'
 import datetime
 import hashlib
 import shutil
@@ -109,9 +120,9 @@ with archive.open("rb") as stream:
 if digest.hexdigest() != expected:
     raise SystemExit("SHA-256 校验失败")
 
-staging = Path(tempfile.mkdtemp(prefix=".neoforge-dev.staging-", dir=skills_dir))
+staging = Path(tempfile.mkdtemp(prefix=".minecraft-mod-dev.staging-", dir=skills_dir))
 backup = None
-target = skills_dir / "neoforge-dev"
+target = skills_dir / "minecraft-mod-dev"
 try:
     with zipfile.ZipFile(archive) as bundle:
         for member in bundle.infolist():
@@ -122,15 +133,15 @@ try:
             raise SystemExit("ZIP CRC 校验失败")
         bundle.extractall(staging)
 
-    extracted = staging / "neoforge-dev"
+    extracted = staging / "minecraft-mod-dev"
     if not (extracted / "SKILL.md").is_file():
-        raise SystemExit("ZIP 缺少 neoforge-dev/SKILL.md")
+        raise SystemExit("ZIP 缺少 minecraft-mod-dev/SKILL.md")
     if target.exists() or target.is_symlink():
         suffix = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-        backup = skills_dir / f"neoforge-dev.backup-{suffix}"
+        backup = skills_dir / f"minecraft-mod-dev.backup-{suffix}"
         index = 1
         while backup.exists() or backup.is_symlink():
-            backup = skills_dir / f"neoforge-dev.backup-{suffix}-{index}"
+            backup = skills_dir / f"minecraft-mod-dev.backup-{suffix}-{index}"
             index += 1
         target.rename(backup)
     extracted.rename(target)
@@ -146,7 +157,7 @@ finally:
 PY
 ```
 
-Release ZIP 保留顶层 `neoforge-dev/`，可直接用于 `$CODEX_HOME/skills`。Release 安装只依赖 Python 3，不要求 `shasum` 或 `sha256sum`。
+Release ZIP 保留顶层 `minecraft-mod-dev/`，可直接用于 `$CODEX_HOME/skills`。Release 安装只依赖 Python 3，不要求 `shasum` 或 `sha256sum`。
 
 ## 范围与版本状态
 
@@ -178,7 +189,7 @@ NeoForge 1.21.1 基线至少要记录以下证据：
 5. 项目存在时的 GameTest/JUnit；
 6. Minecraft、loader、Java、Gradle、mapping 和提交版本。
 
-图形、专用服务器或网络环境不可用时，保留未完成项和原因，不能把静态检查当作完整验收。详细门控见 [`baseline-gate.md`](neoforge-dev/references/baseline-gate.md)。
+图形、专用服务器或网络环境不可用时，保留未完成项和原因，不能把静态检查当作完整验收。详细门控见 [`baseline-gate.md`](minecraft-mod-dev/references/baseline-gate.md)。
 
 ## 核心能力
 
@@ -198,8 +209,8 @@ NeoForge 1.21.1 基线至少要记录以下证据：
 不要按目录名或记忆猜版本。先读取适用的 `AGENTS.md`、README、`settings.gradle[.kts]`、`build.gradle[.kts]`、`gradle.properties` 和 `gradlew`，再运行：
 
 ```bash
-python3 neoforge-dev/scripts/validate_loader.py /path/to/mod-project --json
-python3 neoforge-dev/scripts/validate_structure.py /path/to/mod-project --loader auto --json
+python3 minecraft-mod-dev/scripts/validate_loader.py /path/to/mod-project --json
+python3 minecraft-mod-dev/scripts/validate_structure.py /path/to/mod-project --loader auto --json
 ```
 
 识别到多模块、多 loader 或版本冲突时，显式选择目标，不要静默把整个项目压成一个 loader。
@@ -210,9 +221,9 @@ python3 neoforge-dev/scripts/validate_structure.py /path/to/mod-project --loader
 
 | 目标 | 入口 | 不要混入 |
 | --- | --- | --- |
-| NeoForge 1.21.1 | [`neoforge/1.21.1.md`](neoforge-dev/references/neoforge/1.21.1.md) | Forge `mods.toml`/`SimpleChannel`、Cleanroom `mcmod.info`/旧生命周期、26.1/Java 25 API |
-| Forge 1.20.1 | [`forge/1.20.1.md`](neoforge-dev/references/forge/1.20.1.md) | NeoForge payload/StreamCodec、Cleanroom 1.12.2 生命周期、Java 21 假设 |
-| Cleanroom 1.12.2 | [`cleanroom/1.12.2.md`](neoforge-dev/references/cleanroom/1.12.2.md) | 1.20.1/1.21.1 注册、现代 data components、现代 payload |
+| NeoForge 1.21.1 | [`neoforge/1.21.1.md`](minecraft-mod-dev/references/neoforge/1.21.1.md) | Forge `mods.toml`/`SimpleChannel`、Cleanroom `mcmod.info`/旧生命周期、26.1/Java 25 API |
+| Forge 1.20.1 | [`forge/1.20.1.md`](minecraft-mod-dev/references/forge/1.20.1.md) | NeoForge payload/StreamCodec、Cleanroom 1.12.2 生命周期、Java 21 假设 |
+| Cleanroom 1.12.2 | [`cleanroom/1.12.2.md`](minecraft-mod-dev/references/cleanroom/1.12.2.md) | 1.20.1/1.21.1 注册、现代 data components、现代 payload |
 
 ### 3. 实现并验证
 
@@ -238,12 +249,12 @@ python3 neoforge-dev/scripts/validate_structure.py /path/to/mod-project --loader
 
 | 源 → 目标 | 指南 |
 | --- | --- |
-| NeoForge 1.21.1 → Forge 1.20.1 | [`neoforge-to-forge.md`](neoforge-dev/references/migration/neoforge-to-forge.md) |
-| Forge 1.20.1 → NeoForge 1.21.1 | [`forge-to-neoforge.md`](neoforge-dev/references/migration/forge-to-neoforge.md) |
-| NeoForge 1.21.1 → Cleanroom 1.12.2 | [`neoforge-to-cleanroom.md`](neoforge-dev/references/migration/neoforge-to-cleanroom.md) |
-| Cleanroom 1.12.2 → NeoForge 1.21.1 | [`cleanroom-to-neoforge.md`](neoforge-dev/references/migration/cleanroom-to-neoforge.md) |
-| Forge 1.20.1 → Cleanroom 1.12.2 | [`forge-to-cleanroom.md`](neoforge-dev/references/migration/forge-to-cleanroom.md) |
-| Cleanroom 1.12.2 → Forge 1.20.1 | [`cleanroom-to-forge.md`](neoforge-dev/references/migration/cleanroom-to-forge.md) |
+| NeoForge 1.21.1 → Forge 1.20.1 | [`neoforge-to-forge.md`](minecraft-mod-dev/references/migration/neoforge-to-forge.md) |
+| Forge 1.20.1 → NeoForge 1.21.1 | [`forge-to-neoforge.md`](minecraft-mod-dev/references/migration/forge-to-neoforge.md) |
+| NeoForge 1.21.1 → Cleanroom 1.12.2 | [`neoforge-to-cleanroom.md`](minecraft-mod-dev/references/migration/neoforge-to-cleanroom.md) |
+| Cleanroom 1.12.2 → NeoForge 1.21.1 | [`cleanroom-to-neoforge.md`](minecraft-mod-dev/references/migration/cleanroom-to-neoforge.md) |
+| Forge 1.20.1 → Cleanroom 1.12.2 | [`forge-to-cleanroom.md`](minecraft-mod-dev/references/migration/forge-to-cleanroom.md) |
+| Cleanroom 1.12.2 → Forge 1.20.1 | [`cleanroom-to-forge.md`](minecraft-mod-dev/references/migration/cleanroom-to-forge.md) |
 
 迁移分支的最小顺序：
 
@@ -267,12 +278,12 @@ python3 neoforge-dev/scripts/validate_structure.py /path/to/mod-project --loader
 
 可用 profile 包括：`build_client_server`、`build_launch_gametest`、`build_client_only`、`build_server_only`、`build_launch_only` 和 `custom`。示例和模板：
 
-- [`mod-compatibility.md`](neoforge-dev/references/compatibility/mod-compatibility.md)
-- [`compatibility-matrix.example.json`](neoforge-dev/references/compatibility/compatibility-matrix.example.json)
-- [`schema.json`](neoforge-dev/references/compatibility/schema.json)
-- [`artifact-lock.example.json`](neoforge-dev/references/compatibility/artifact-lock.example.json)
-- [`integration-template.md`](neoforge-dev/references/compatibility/integration-template.md)
-- [`combination-matrix.md`](neoforge-dev/references/testing/combination-matrix.md)
+- [`mod-compatibility.md`](minecraft-mod-dev/references/compatibility/mod-compatibility.md)
+- [`compatibility-matrix.example.json`](minecraft-mod-dev/references/compatibility/compatibility-matrix.example.json)
+- [`schema.json`](minecraft-mod-dev/references/compatibility/schema.json)
+- [`artifact-lock.example.json`](minecraft-mod-dev/references/compatibility/artifact-lock.example.json)
+- [`integration-template.md`](minecraft-mod-dev/references/compatibility/integration-template.md)
+- [`combination-matrix.md`](minecraft-mod-dev/references/testing/combination-matrix.md)
 
 推荐的 adapter 布局：
 
@@ -289,18 +300,18 @@ src/main/java/<root-package>/
 
 ## 辅助脚本
 
-安装后脚本位于 `${CODEX_HOME:-$HOME/.codex}/skills/neoforge-dev/scripts`；在本仓库中可直接使用 `neoforge-dev/scripts/`，根目录 `scripts/` 提供相同的 CLI wrapper。
+安装后脚本位于 `${CODEX_HOME:-$HOME/.codex}/skills/minecraft-mod-dev/scripts`；在本仓库中可直接使用 `minecraft-mod-dev/scripts/`，根目录 `scripts/` 提供相同的 CLI wrapper。
 
 | 脚本 | 用途 | 示例 |
 | --- | --- | --- |
-| `validate_loader.py` | 按 Gradle 子项目识别 loader、Minecraft、Java 和证据；期望不匹配时返回非零 | `python3 neoforge-dev/scripts/validate_loader.py PROJECT --expect-loader neoforge --expect-minecraft 1.21.1` |
-| `validate_structure.py` | 检查 wrapper、Gradle、Java/资源目录和 loader metadata | `python3 neoforge-dev/scripts/validate_structure.py PROJECT --loader auto --json` |
-| `validate_compatibility.py` | 校验 Schema v2、构件、依赖图和 verification requirements | `python3 neoforge-dev/scripts/validate_compatibility.py compatibility-matrix.json --json` |
-| `validate_dependency_graph.py` | 检查 requires/ordering/conflicts 及循环 | `python3 neoforge-dev/scripts/validate_dependency_graph.py compatibility-matrix.json --json` |
-| `generate_compatibility_report.py` | 将矩阵生成 Markdown 报告 | `python3 neoforge-dev/scripts/generate_compatibility_report.py compatibility-matrix.json --output /tmp/compatibility-report.md` |
-| `validate_matrix_fixtures.py` | 回归 planned/blocked/verified、缺失/错版本/侧不对称等 fixture | `python3 neoforge-dev/scripts/validate_matrix_fixtures.py` |
-| `crawl_docs.py` | 抓取同主机 HTTP(S) HTML，限制重定向、页面数和单响应大小 | `python3 neoforge-dev/scripts/crawl_docs.py --url https://docs.neoforged.net/docs/1.21.1/ --output /tmp/neoforge-docs --max-pages 200 --max-bytes 10485760` |
-| `build_doc_index.py` | 从 Markdown/MDX/HTML 建立标题、关键词、哈希索引 | `python3 neoforge-dev/scripts/build_doc_index.py --input /tmp/neoforge-docs/pages --output /tmp/neoforge-doc-index.json` |
+| `validate_loader.py` | 按 Gradle 子项目识别 loader、Minecraft、Java 和证据；期望不匹配时返回非零 | `python3 minecraft-mod-dev/scripts/validate_loader.py PROJECT --expect-loader neoforge --expect-minecraft 1.21.1` |
+| `validate_structure.py` | 检查 wrapper、Gradle、Java/资源目录和 loader metadata | `python3 minecraft-mod-dev/scripts/validate_structure.py PROJECT --loader auto --json` |
+| `validate_compatibility.py` | 校验 Schema v2、构件、依赖图和 verification requirements | `python3 minecraft-mod-dev/scripts/validate_compatibility.py compatibility-matrix.json --json` |
+| `validate_dependency_graph.py` | 检查 requires/ordering/conflicts 及循环 | `python3 minecraft-mod-dev/scripts/validate_dependency_graph.py compatibility-matrix.json --json` |
+| `generate_compatibility_report.py` | 将矩阵生成 Markdown 报告 | `python3 minecraft-mod-dev/scripts/generate_compatibility_report.py compatibility-matrix.json --output /tmp/compatibility-report.md` |
+| `validate_matrix_fixtures.py` | 回归 planned/blocked/verified、缺失/错版本/侧不对称等 fixture | `python3 minecraft-mod-dev/scripts/validate_matrix_fixtures.py` |
+| `crawl_docs.py` | 抓取同主机 HTTP(S) HTML，限制重定向、页面数和单响应大小 | `python3 minecraft-mod-dev/scripts/crawl_docs.py --url https://docs.neoforged.net/docs/1.21.1/ --output /tmp/neoforge-docs --max-pages 200 --max-bytes 10485760` |
+| `build_doc_index.py` | 从 Markdown/MDX/HTML 建立标题、关键词、哈希索引 | `python3 minecraft-mod-dev/scripts/build_doc_index.py --input /tmp/neoforge-docs/pages --output /tmp/neoforge-doc-index.json` |
 
 文档爬虫只接受 `http`/`https` 起始 URL，只跟随起始站点同主机的 HTML 链接，并拒绝跨主机或非 HTTP(S) 重定向；`--max-bytes` 默认 10 MiB。输出目录包含 `manifest.json` 和 `pages/`，不会修改模组源码。
 
@@ -308,7 +319,7 @@ src/main/java/<root-package>/
 
 ```text
 .
-├── neoforge-dev/
+├── minecraft-mod-dev/
 │   ├── SKILL.md                    # Codex skill 入口与执行契约
 │   ├── agents/openai.yaml          # Codex UI 元数据和默认提示词
 │   ├── references/
@@ -333,24 +344,24 @@ src/main/java/<root-package>/
 
 ```bash
 python3 scripts/validate.py
-python3 "${CODEX_HOME:-$HOME/.codex}/skills/.system/skill-creator/scripts/quick_validate.py" neoforge-dev
-python3 -m py_compile neoforge-dev/scripts/*.py
-python3 -B neoforge-dev/scripts/crawl_docs.py --help
-python3 -B neoforge-dev/scripts/build_doc_index.py --help
-python3 -B neoforge-dev/scripts/validate_loader.py --help
-python3 -B neoforge-dev/scripts/validate_structure.py --help
-python3 -B neoforge-dev/scripts/validate_compatibility.py --help
-python3 -B neoforge-dev/scripts/validate_dependency_graph.py --help
-python3 -B neoforge-dev/scripts/generate_compatibility_report.py --help
-python3 -B neoforge-dev/scripts/validate_matrix_fixtures.py
-python3 neoforge-dev/scripts/validate_compatibility.py \
-  neoforge-dev/references/compatibility/compatibility-matrix.example.json --json
+python3 "${CODEX_HOME:-$HOME/.codex}/skills/.system/skill-creator/scripts/quick_validate.py" minecraft-mod-dev
+python3 -m py_compile minecraft-mod-dev/scripts/*.py
+python3 -B minecraft-mod-dev/scripts/crawl_docs.py --help
+python3 -B minecraft-mod-dev/scripts/build_doc_index.py --help
+python3 -B minecraft-mod-dev/scripts/validate_loader.py --help
+python3 -B minecraft-mod-dev/scripts/validate_structure.py --help
+python3 -B minecraft-mod-dev/scripts/validate_compatibility.py --help
+python3 -B minecraft-mod-dev/scripts/validate_dependency_graph.py --help
+python3 -B minecraft-mod-dev/scripts/generate_compatibility_report.py --help
+python3 -B minecraft-mod-dev/scripts/validate_matrix_fixtures.py
+python3 minecraft-mod-dev/scripts/validate_compatibility.py \
+  minecraft-mod-dev/references/compatibility/compatibility-matrix.example.json --json
 python3 scripts/package.py
-unzip -t dist/neoforge-dev.zip
+unzip -t dist/minecraft-mod-dev.zip
 git diff --check
 ```
 
-`scripts/package.py` 会先执行 `scripts/validate.py`，再生成可重复的 `dist/neoforge-dev.zip` 和 `dist/neoforge-dev.zip.sha256`。ZIP 只包含 `neoforge-dev/`，不会把根目录 README、`dist/`、`__pycache__/` 或本机配置打入 skill。
+`scripts/package.py` 会先执行 `scripts/validate.py`，再生成可重复的 `dist/minecraft-mod-dev.zip` 和 `dist/minecraft-mod-dev.zip.sha256`。ZIP 只包含 `minecraft-mod-dev/`，不会把根目录 README、`dist/`、`__pycache__/` 或本机配置打入 skill。
 
 GitHub Actions 会在 push 和 pull request 上运行同一组核心检查。发布前还应确认 ZIP 完整性、SHA-256、公开下载和 CI 结果；提交与发布使用维护者已登录的 GitHub CLI 账号。
 
@@ -360,15 +371,15 @@ GitHub Actions 会在 push 和 pull request 上运行同一组核心检查。发
 
 - [NeoForge 1.21.1 文档](https://docs.neoforged.net/docs/1.21.1/)，审计提交 `816c03d31ff7948179c7bd4a58d23bcfda09c18a`；
 - [Forge 1.20.x 文档](https://docs.minecraftforge.net/en/1.20.x/)，源码提交 `87526dd760129b356e88f130550d646d4eb2fa31`；
-- [Cleanroom Wiki](https://cleanroommc.com/zh/wiki/end-user-guide/introduction) 及 [官方源码仓库](https://github.com/CleanroomMC)，各快照见 [`official-docs.md`](neoforge-dev/references/official-docs.md)；
+- [Cleanroom Wiki](https://cleanroommc.com/zh/wiki/end-user-guide/introduction) 及 [官方源码仓库](https://github.com/CleanroomMC)，各快照见 [`official-docs.md`](minecraft-mod-dev/references/official-docs.md)；
 - 上游适配来源：[cnlimiter/opencode-neoforge-skill](https://github.com/cnlimiter/opencode-neoforge-skill)。
 
 仓库内参考入口：
 
-- [`official-docs.md`](neoforge-dev/references/official-docs.md)：版本、Java、构建任务和官方页面索引；
-- [`java-style.md`](neoforge-dev/references/common/java-style.md)、[`package-structure.md`](neoforge-dev/references/common/package-structure.md)、[`resources-layout.md`](neoforge-dev/references/common/resources-layout.md)：通用代码与项目结构约束；
-- [`testing-validation.md`](neoforge-dev/references/common/testing-validation.md)：构建、运行和证据记录检查表；
-- [`loader-fixture-contract.md`](neoforge-dev/references/testing/loader-fixture-contract.md)：三种 loader 的识别与结构 fixture 合约。
+- [`official-docs.md`](minecraft-mod-dev/references/official-docs.md)：版本、Java、构建任务和官方页面索引；
+- [`java-style.md`](minecraft-mod-dev/references/common/java-style.md)、[`package-structure.md`](minecraft-mod-dev/references/common/package-structure.md)、[`resources-layout.md`](minecraft-mod-dev/references/common/resources-layout.md)：通用代码与项目结构约束；
+- [`testing-validation.md`](minecraft-mod-dev/references/common/testing-validation.md)：构建、运行和证据记录检查表；
+- [`loader-fixture-contract.md`](minecraft-mod-dev/references/testing/loader-fixture-contract.md)：三种 loader 的识别与结构 fixture 合约。
 
 详细归属、引用和改动边界见 [`NOTICE.md`](NOTICE.md)。贡献前阅读 [`CONTRIBUTING.md`](CONTRIBUTING.md)，每条版本事实都要能回溯到对应 loader/Minecraft 版本的官方资料或固定提交。
 

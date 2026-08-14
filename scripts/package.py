@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Create a reproducible release ZIP containing the neoforge-dev skill."""
+"""Create a reproducible release ZIP containing the minecraft-mod-dev skill."""
 
 from __future__ import annotations
 
@@ -11,10 +11,10 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SKILL_DIR = ROOT / "neoforge-dev"
+SKILL_DIR = ROOT / "minecraft-mod-dev"
 DIST_DIR = ROOT / "dist"
-ZIP_PATH = DIST_DIR / "neoforge-dev.zip"
-CHECKSUM_PATH = DIST_DIR / "neoforge-dev.zip.sha256"
+ZIP_PATH = DIST_DIR / "minecraft-mod-dev.zip"
+CHECKSUM_PATH = DIST_DIR / "minecraft-mod-dev.zip.sha256"
 ZIP_TIMESTAMP = (2026, 1, 1, 0, 0, 0)
 
 

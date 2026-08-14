@@ -193,7 +193,7 @@ def parse_args() -> argparse.Namespace:
         default=DEFAULT_MAX_BYTES,
         help=f"单个响应最多读取字节数（默认 {DEFAULT_MAX_BYTES}）",
     )
-    parser.add_argument("--user-agent", default="codex-neoforge-skill-doc-crawler/1.0", help="User-Agent")
+    parser.add_argument("--user-agent", default="codex-minecraft-mod-skill-doc-crawler/1.0", help="User-Agent")
     return parser.parse_args()
 
 

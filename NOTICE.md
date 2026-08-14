@@ -8,7 +8,7 @@
 - 审阅快照：`6b1b55cefaa0be602ad1f96b678d9a4cd26eb67c`
 - 快照作者：Xin Luo
 
-审阅到的上游快照主要包含 `neoforge-dev/SKILL.md` 和 README 文件，未包含 README 所描述的示例/依赖子 skill，也未发现随快照提供的 `LICENSE` 文件。当前仓库的 Codex 改写、知识库、脚本、安装器和打包代码由本仓库维护，并按根目录 [MIT License](LICENSE) 发布。
+审阅到的上游快照主要包含 `neoforge-dev/SKILL.md` 和 README 文件（这是上游历史路径，当前项目的 skill ID 已改为 `minecraft-mod-dev`），未包含 README 所描述的示例/依赖子 skill，也未发现随快照提供的 `LICENSE` 文件。当前仓库的 Codex 改写、知识库、脚本、安装器和打包代码由本仓库维护，并按根目录 [MIT License](LICENSE) 发布。
 
 ## 适配范围
 
@@ -22,4 +22,4 @@
 
 ## 官方资料引用
 
-版本知识库引用的 NeoForge、Forge 和 CleanroomMC 官方资料及固定提交，统一记录在 [`neoforge-dev/references/official-docs.md`](neoforge-dev/references/official-docs.md)。这些链接用于版本事实核对，不表示本项目隶属于任何 loader 项目或 Minecraft 项目。
+版本知识库引用的 NeoForge、Forge 和 CleanroomMC 官方资料及固定提交，统一记录在 [`minecraft-mod-dev/references/official-docs.md`](minecraft-mod-dev/references/official-docs.md)。这些链接用于版本事实核对，不表示本项目隶属于任何 loader 项目或 Minecraft 项目。

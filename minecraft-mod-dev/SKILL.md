@@ -1,9 +1,9 @@
 ---
-name: neoforge-dev
+name: minecraft-mod-dev
 description: "面向 Codex 的 Minecraft 模组工程 skill：默认以 NeoForge 1.21.1 为基线，支持项目识别、Java/Gradle 代码与结构规范、注册/事件/网络/资源/数据生成、构建调试、测试验收、跨版本 Mod 联动兼容矩阵，以及在基线完成后按官方资料完成 NeoForge 1.21.1、Forge 1.20.1、Cleanroom 1.12.2 六条有向迁移路径。用于 NeoForge、Forge、Cleanroom、模组开发、开发 mod、联动 Mod、依赖版本、物品、方块、实体、配方、世界生成、数据生成、构建、崩溃、移植或版本兼容请求。"
 ---
 
-# Minecraft 模组开发（NeoForge 1.21.1 基线）
+# Minecraft 模组开发（多加载器，NeoForge 1.21.1 基线）
 
 把当前请求当作真实工程任务执行：读取项目事实，选择唯一目标加载器和版本，修改最小文件集合，最后运行可复核的构建/运行验证。不要依赖未安装的子 skill、固定工作目录或未配置 MCP。
 
@@ -29,11 +29,11 @@ BASELINE_GATE:
 3. 运行只读识别：
 
    ```bash
-   python3 neoforge-dev/scripts/validate_loader.py PROJECT --json
-   python3 neoforge-dev/scripts/validate_structure.py PROJECT --loader auto --json
+   python3 minecraft-mod-dev/scripts/validate_loader.py PROJECT --json
+   python3 minecraft-mod-dev/scripts/validate_structure.py PROJECT --loader auto --json
    ```
 
-   如果从已安装 skill 运行，使用 `python3 $CODEX_HOME/skills/neoforge-dev/scripts/...`。
+   如果从已安装 skill 运行，使用 `python3 $CODEX_HOME/skills/minecraft-mod-dev/scripts/...`。
 
 4. 从 Gradle toolchain、依赖声明、元数据和任务列表记录 Minecraft、loader、Java、Gradle、mappings、运行目录和数据生成任务。
 5. 查看 `git status --short`，保留用户已有改动，只编辑本任务相关文件。
@@ -120,16 +120,16 @@ SOURCE loader/Minecraft/Java
 运行矩阵检查：
 
 ```bash
-python3 neoforge-dev/scripts/validate_compatibility.py compatibility-matrix.json --json
-python3 neoforge-dev/scripts/validate_compatibility.py compatibility-matrix.json \
+python3 minecraft-mod-dev/scripts/validate_compatibility.py compatibility-matrix.json --json
+python3 minecraft-mod-dev/scripts/validate_compatibility.py compatibility-matrix.json \
   --source neoforge:1.21.1 --target forge:1.20.1
 # 可选：同时核对目标项目的 Gradle、metadata 和已实现 adapter
-python3 neoforge-dev/scripts/validate_compatibility.py compatibility-matrix.json \
+python3 minecraft-mod-dev/scripts/validate_compatibility.py compatibility-matrix.json \
   --target forge:1.20.1 --project /path/to/forge-project --json
-python3 neoforge-dev/scripts/validate_dependency_graph.py compatibility-matrix.json --json
-python3 neoforge-dev/scripts/generate_compatibility_report.py compatibility-matrix.json \
+python3 minecraft-mod-dev/scripts/validate_dependency_graph.py compatibility-matrix.json --json
+python3 minecraft-mod-dev/scripts/generate_compatibility_report.py compatibility-matrix.json \
   --output /tmp/compatibility-report.md
-python3 neoforge-dev/scripts/validate_matrix_fixtures.py
+python3 minecraft-mod-dev/scripts/validate_matrix_fixtures.py
 ```
 
 ## 5. 实现与调试工作流
@@ -184,22 +184,22 @@ python3 neoforge-dev/scripts/validate_matrix_fixtures.py
 
 ```bash
 # 抓取同主机 HTML，限制 HTTP(S) 重定向和单响应大小，处理 429/5xx 退避，输出 manifest.json 与 pages/
-python3 neoforge-dev/scripts/crawl_docs.py \
+python3 minecraft-mod-dev/scripts/crawl_docs.py \
   --url https://docs.neoforged.net/docs/1.21.1/ \
   --output /tmp/neoforge-docs --max-pages 200 --max-bytes 10485760
 
 # 从 Markdown/MDX/HTML 建立标题、关键词、哈希索引
-python3 neoforge-dev/scripts/build_doc_index.py \
+python3 minecraft-mod-dev/scripts/build_doc_index.py \
   --input /tmp/neoforge-docs/pages --output /tmp/neoforge-doc-index.json
 
 # 识别 loader、Minecraft、Java，期望不匹配时返回非零
-python3 neoforge-dev/scripts/validate_loader.py . --expect-loader neoforge --expect-minecraft 1.21.1
+python3 minecraft-mod-dev/scripts/validate_loader.py . --expect-loader neoforge --expect-minecraft 1.21.1
 
 # 检查对应目录和元数据文件
-python3 neoforge-dev/scripts/validate_structure.py . --loader auto
+python3 minecraft-mod-dev/scripts/validate_structure.py . --loader auto
 
 # 校验迁移分支的跨版本 Mod 联动矩阵
-python3 neoforge-dev/scripts/validate_compatibility.py compatibility-matrix.json --json
+python3 minecraft-mod-dev/scripts/validate_compatibility.py compatibility-matrix.json --json
 ```
 
 仓库根目录的同名 `scripts/*.py` 是上述 bundled script 的 CLI wrapper；安装后优先使用 skill 目录内版本。

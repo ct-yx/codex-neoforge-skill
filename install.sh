@@ -10,9 +10,9 @@ elif [[ $# -gt 0 ]]; then
 fi
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source_dir="$repo_root/neoforge-dev"
+source_dir="$repo_root/minecraft-mod-dev"
 skills_dir="${CODEX_HOME:-$HOME/.codex}/skills"
-target_dir="$skills_dir/neoforge-dev"
+target_dir="$skills_dir/minecraft-mod-dev"
 
 if [[ ! -f "$source_dir/SKILL.md" || ! -f "$source_dir/agents/openai.yaml" ]]; then
   printf 'Invalid package: required skill files are missing.\n' >&2
@@ -21,11 +21,11 @@ fi
 
 mkdir -p "$skills_dir"
 
-staging_dir="$(mktemp -d "$skills_dir/.neoforge-dev.staging.XXXXXX")"
+staging_dir="$(mktemp -d "$skills_dir/.minecraft-mod-dev.staging.XXXXXX")"
 trap 'rm -rf "$staging_dir"' EXIT
-cp -R "$source_dir" "$staging_dir/neoforge-dev"
+cp -R "$source_dir" "$staging_dir/minecraft-mod-dev"
 
-if [[ ! -f "$staging_dir/neoforge-dev/SKILL.md" || ! -f "$staging_dir/neoforge-dev/agents/openai.yaml" ]]; then
+if [[ ! -f "$staging_dir/minecraft-mod-dev/SKILL.md" || ! -f "$staging_dir/minecraft-mod-dev/agents/openai.yaml" ]]; then
   printf 'Staging package validation failed.\n' >&2
   exit 1
 fi
@@ -48,6 +48,6 @@ if [[ -e "$target_dir" || -L "$target_dir" ]]; then
   printf 'Existing installation moved to %s\n' "$backup_dir"
 fi
 
-mv "$staging_dir/neoforge-dev" "$target_dir"
-printf 'Installed neoforge-dev to %s\n' "$target_dir"
+mv "$staging_dir/minecraft-mod-dev" "$target_dir"
+printf 'Installed minecraft-mod-dev to %s\n' "$target_dir"
 printf 'The skill will be available from the next Codex turn.\n'

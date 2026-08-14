@@ -7,7 +7,7 @@
 1. 默认基线始终是 NeoForge 1.21.1 / Java 21。
 2. Forge 1.20.1 和 Cleanroom 1.12.2 内容只能作为后续迁移参考；不要把它们的 API 示例混入 NeoForge 基线章节。
 3. 每条版本事实都应附带官方文档、官方仓库或固定提交；不要用未标版本的博客替代主来源。
-4. 优先修改 `neoforge-dev/SKILL.md` 和对应 `references/` 文件；不要把完整外站原文复制进仓库。
+4. 优先修改 `minecraft-mod-dev/SKILL.md` 和对应 `references/` 文件；不要把完整外站原文复制进仓库。
 5. 辅助脚本只使用 Python 标准库，保持可在干净 Python 环境运行。
 6. 迁移或联动 Mod 变更必须更新对应有向路径和 `compatibility-matrix` 证据；不能只修改 API 差异表。
 
@@ -15,17 +15,17 @@
 
 ```bash
 python3 scripts/validate.py
-python3 "${CODEX_HOME:-$HOME/.codex}/skills/.system/skill-creator/scripts/quick_validate.py" neoforge-dev
-python3 -B neoforge-dev/scripts/crawl_docs.py --help >/dev/null
-python3 -B neoforge-dev/scripts/build_doc_index.py --help >/dev/null
-python3 -B neoforge-dev/scripts/validate_loader.py --help >/dev/null
-python3 -B neoforge-dev/scripts/validate_structure.py --help >/dev/null
-python3 -B neoforge-dev/scripts/validate_compatibility.py --help >/dev/null
-python3 -B neoforge-dev/scripts/validate_dependency_graph.py --help >/dev/null
-python3 -B neoforge-dev/scripts/generate_compatibility_report.py --help >/dev/null
-python3 -B neoforge-dev/scripts/validate_matrix_fixtures.py
+python3 "${CODEX_HOME:-$HOME/.codex}/skills/.system/skill-creator/scripts/quick_validate.py" minecraft-mod-dev
+python3 -B minecraft-mod-dev/scripts/crawl_docs.py --help >/dev/null
+python3 -B minecraft-mod-dev/scripts/build_doc_index.py --help >/dev/null
+python3 -B minecraft-mod-dev/scripts/validate_loader.py --help >/dev/null
+python3 -B minecraft-mod-dev/scripts/validate_structure.py --help >/dev/null
+python3 -B minecraft-mod-dev/scripts/validate_compatibility.py --help >/dev/null
+python3 -B minecraft-mod-dev/scripts/validate_dependency_graph.py --help >/dev/null
+python3 -B minecraft-mod-dev/scripts/generate_compatibility_report.py --help >/dev/null
+python3 -B minecraft-mod-dev/scripts/validate_matrix_fixtures.py
 python3 scripts/package.py
-unzip -t dist/neoforge-dev.zip
+unzip -t dist/minecraft-mod-dev.zip
 git diff --check
 ```
 

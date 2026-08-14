@@ -1,0 +1,4 @@
+interface:
+  display_name: "Minecraft 模组开发"
+  short_description: "跨 NeoForge、Forge、Cleanroom 的 Minecraft 模组开发与迁移"
+  default_prompt: "使用 $minecraft-mod-dev 以 NeoForge 1.21.1 为基线检查当前项目、联动 Mod 和迁移状态。"

@@ -19,21 +19,21 @@ jobs:
         run: python3 scripts/validate.py
       - name: Check bundled helper scripts
         run: |
-          python3 -m py_compile neoforge-dev/scripts/*.py
-          python3 neoforge-dev/scripts/crawl_docs.py --help >/dev/null
-          python3 neoforge-dev/scripts/build_doc_index.py --help >/dev/null
-          python3 neoforge-dev/scripts/validate_loader.py --help >/dev/null
-          python3 neoforge-dev/scripts/validate_structure.py --help >/dev/null
-          python3 neoforge-dev/scripts/validate_compatibility.py --help >/dev/null
-          python3 neoforge-dev/scripts/validate_dependency_graph.py --help >/dev/null
-          python3 neoforge-dev/scripts/generate_compatibility_report.py --help >/dev/null
-          python3 neoforge-dev/scripts/validate_matrix_fixtures.py
+          python3 -m py_compile minecraft-mod-dev/scripts/*.py
+          python3 minecraft-mod-dev/scripts/crawl_docs.py --help >/dev/null
+          python3 minecraft-mod-dev/scripts/build_doc_index.py --help >/dev/null
+          python3 minecraft-mod-dev/scripts/validate_loader.py --help >/dev/null
+          python3 minecraft-mod-dev/scripts/validate_structure.py --help >/dev/null
+          python3 minecraft-mod-dev/scripts/validate_compatibility.py --help >/dev/null
+          python3 minecraft-mod-dev/scripts/validate_dependency_graph.py --help >/dev/null
+          python3 minecraft-mod-dev/scripts/generate_compatibility_report.py --help >/dev/null
+          python3 minecraft-mod-dev/scripts/validate_matrix_fixtures.py
       - name: Validate compatibility example
-        run: python3 neoforge-dev/scripts/validate_compatibility.py neoforge-dev/references/compatibility/compatibility-matrix.example.json --json
+        run: python3 minecraft-mod-dev/scripts/validate_compatibility.py minecraft-mod-dev/references/compatibility/compatibility-matrix.example.json --json
       - name: Validate compatibility dependency graph
-        run: python3 neoforge-dev/scripts/validate_dependency_graph.py neoforge-dev/references/compatibility/compatibility-matrix.example.json --json
+        run: python3 minecraft-mod-dev/scripts/validate_dependency_graph.py minecraft-mod-dev/references/compatibility/compatibility-matrix.example.json --json
       - name: Validate matrix fixtures
-        run: python3 neoforge-dev/scripts/validate_matrix_fixtures.py
+        run: python3 minecraft-mod-dev/scripts/validate_matrix_fixtures.py
       - name: Validate loader fixture contract
         run: |
           fixture_root="$(mktemp -d)"
@@ -52,15 +52,15 @@ jobs:
           printf "plugins { id 'xyz.wagyourtail.unimined' version '1.4.36-kappa' }\njava { toolchain { languageVersion = JavaLanguageVersion.of(25) } }\nunimined.minecraft { version '1.12.2' }\n" > "$fixture_root/clean/build.gradle"
           printf 'mod_id=example\nroot_package=com.example\nmod_version=1.0.0\n' > "$fixture_root/clean/gradle.properties"
           : > "$fixture_root/clean/src/main/resources/mcmod.info"
-          python3 neoforge-dev/scripts/validate_loader.py "$fixture_root/neo" --expect-loader neoforge --expect-minecraft 1.21.1
-          python3 neoforge-dev/scripts/validate_loader.py "$fixture_root/forge" --expect-loader forge --expect-minecraft 1.20.1
-          python3 neoforge-dev/scripts/validate_loader.py "$fixture_root/clean" --expect-loader cleanroom --expect-minecraft 1.12.2
-          python3 neoforge-dev/scripts/validate_structure.py "$fixture_root/neo" --loader neoforge
-          python3 neoforge-dev/scripts/validate_structure.py "$fixture_root/forge" --loader forge
-          python3 neoforge-dev/scripts/validate_structure.py "$fixture_root/clean" --loader cleanroom
+          python3 minecraft-mod-dev/scripts/validate_loader.py "$fixture_root/neo" --expect-loader neoforge --expect-minecraft 1.21.1
+          python3 minecraft-mod-dev/scripts/validate_loader.py "$fixture_root/forge" --expect-loader forge --expect-minecraft 1.20.1
+          python3 minecraft-mod-dev/scripts/validate_loader.py "$fixture_root/clean" --expect-loader cleanroom --expect-minecraft 1.12.2
+          python3 minecraft-mod-dev/scripts/validate_structure.py "$fixture_root/neo" --loader neoforge
+          python3 minecraft-mod-dev/scripts/validate_structure.py "$fixture_root/forge" --loader forge
+          python3 minecraft-mod-dev/scripts/validate_structure.py "$fixture_root/clean" --loader cleanroom
       - name: Generate compatibility report
-        run: python3 neoforge-dev/scripts/generate_compatibility_report.py neoforge-dev/references/compatibility/compatibility-matrix.example.json --output /tmp/compatibility-report.md
+        run: python3 minecraft-mod-dev/scripts/generate_compatibility_report.py minecraft-mod-dev/references/compatibility/compatibility-matrix.example.json --output /tmp/compatibility-report.md
       - name: Build release archive
         run: python3 scripts/package.py
       - name: Inspect archive
-        run: unzip -l dist/neoforge-dev.zip
+        run: unzip -l dist/minecraft-mod-dev.zip

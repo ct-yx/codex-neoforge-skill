@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/ct-yx/codex-neoforge-skill/schema/compatibility-matrix-v2.json",
+  "$id": "https://github.com/ct-yx/codex-minecraft-mod-skill/schema/compatibility-matrix-v2.json",
   "title": "Codex Minecraft Mod compatibility matrix",
   "type": "object",
   "required": ["schema_version", "project_mod_id", "entries"],

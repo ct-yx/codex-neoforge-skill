@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 README_FILE = ROOT / "README.md"
 CONTRIBUTING_FILE = ROOT / "CONTRIBUTING.md"
 NOTICE_FILE = ROOT / "NOTICE.md"
-SKILL_DIR = ROOT / "neoforge-dev"
+SKILL_DIR = ROOT / "minecraft-mod-dev"
 SKILL_FILE = SKILL_DIR / "SKILL.md"
 OPENAI_FILE = SKILL_DIR / "agents" / "openai.yaml"
 REFERENCE_FILE = SKILL_DIR / "references" / "official-docs.md"
@@ -100,8 +100,8 @@ def main() -> None:
     fields = parse_frontmatter(SKILL_FILE.read_text(encoding="utf-8"))
     if set(fields) != {"name", "description"}:
         fail("frontmatter must contain exactly name and description")
-    if fields["name"] != "neoforge-dev":
-        fail("skill name must be neoforge-dev")
+    if fields["name"] != "minecraft-mod-dev":
+        fail("skill name must be minecraft-mod-dev")
     if not fields["description"]:
         fail("skill description must not be empty")
 
@@ -109,7 +109,7 @@ def main() -> None:
     required_fragments = (
         'display_name: "Minecraft 模组开发"',
         "short_description:",
-        'default_prompt: "使用 $neoforge-dev',
+        'default_prompt: "使用 $minecraft-mod-dev',
     )
     for fragment in required_fragments:
         if fragment not in interface:
@@ -179,7 +179,7 @@ def main() -> None:
         "BASELINE_GATE:",
         "Forge 1.20.1",
         "Cleanroom 1.12.2",
-        "releases/latest/download/neoforge-dev.zip",
+        "releases/latest/download/minecraft-mod-dev.zip",
         "CONTRIBUTING.md",
         "compatibility-matrix",
         "联动 Mod",
